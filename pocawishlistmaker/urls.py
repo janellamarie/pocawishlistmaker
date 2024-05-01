@@ -20,5 +20,5 @@ from . import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", home.index, name="index")
+    path('', home.index, name="index")
 ]
