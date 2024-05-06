@@ -15,10 +15,20 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+from pocawishlistmaker import views
+
 from . import home
+
+# create the API routes
+router = routers.DefaultRouter()
+router.register(r'tags', views.Tags, 'tag')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home.index, name="index")
+    path('', home.index, name="index"),
+
+    # API
+    path('api/', include(router.urls)),
 ]
