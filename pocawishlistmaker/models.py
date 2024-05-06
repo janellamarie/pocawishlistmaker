@@ -5,8 +5,7 @@ class Items(models.Model):
   id = models.AutoField(primary_key=True)
   name = models.CharField()
   price = models.IntegerField()
-  link = models.CharField()
-  created_at = models.DateTimeField(default=timezone.now)
+  created_at = models.DateTimeField(default=timezone.now())
   updated_at = models.DateTimeField()
 
   def __str__(self):
@@ -15,7 +14,7 @@ class Items(models.Model):
 class Tags(models.Model):
   id = models.AutoField(primary_key=True) 
   tag = models.CharField()
-  created_at = models.DateTimeField(default=timezone.now)
+  created_at = models.DateTimeField(default=timezone.now())
   updated_at = models.DateTimeField()
 
   def __str__(self):
@@ -25,7 +24,7 @@ class Wishlists(models.Model):
   id = models.AutoField(primary_key=True)
   name = models.CharField()
   description = models.CharField()
-  created_at = models.DateTimeField(default=timezone.now)
+  created_at = models.DateTimeField(default=timezone.now())
   updated_at = models.DateTimeField()
 
   def __str__(self):
