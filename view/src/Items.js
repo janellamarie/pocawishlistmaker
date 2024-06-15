@@ -1,8 +1,9 @@
 import './App.css';
-import axios, { isCancel } from 'axios';
+import axios from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { Button, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, Spinner, useToast } from '@chakra-ui/react';
+import { Button, Card, CardHeader, Heading, Image, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, SimpleGrid, Spinner, useToast, CardBody, Text, CardFooter } from '@chakra-ui/react';
+import { ExternalLinkIcon } from '@chakra-ui/icons'
 
 function parseWebsite(url) {
   const split = url.split('.')
@@ -21,17 +22,29 @@ function createList(items) {
   for (let i = 0; i < items.length; i++) {
     console.log(items[i])
     list.push(
-      <>
-        <li><img src={items[i].image_link} width={150} /></li>
-        <li>{items[i].name}</li>
-        <li>{items[i].price}</li>
-      </>     
+      <Card variant='outline'>
+        <CardHeader align='center' pb={0}>
+          <Image src={items[i].image_link} boxSize='150px' mb={2}/> 
+          <Heading size='xs'>
+            {items[i].name}
+          </Heading>
+        </CardHeader>  
+        <CardBody align='left' pb={0}>
+          <Text fontSize='l'>
+            {items[i].website === "mercari us" ? "¥" : "$" }
+            {items[i].price.toFixed(2)}
+          </Text>
+        </CardBody>
+        <Button variant='link' as='a' href={items[i].link} target="_blank">
+          <ExternalLinkIcon />
+        </Button>
+      </Card>
     )
   }
   return (
-    <ul>
+    <SimpleGrid spacing={3} templateColumns='repeat(auto-fill, minmax(240px, 1fr))'>
       {list}
-    </ul>
+    </SimpleGrid>
   )
 }
 

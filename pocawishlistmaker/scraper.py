@@ -1,4 +1,5 @@
-import requests
+import time
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -32,8 +33,36 @@ def ScrapeMercariUS(url):
 
   return {'name': name,'price': price, 'status': status, 'image_link': img_link}
 
+def ScrapeMercariJP(url):
+  options = Options()
+  options.add_argument("--headless")
+
+  browser = webdriver.Chrome(options=options)
+  print("Navigating to", url)
+  browser.get(url)
+  page = browser.page_source
+
+  time.sleep(5)
+
+  print("Parsing information...")
+  content = browser.page_source.encode('utf-8').strip()
+  soup = BeautifulSoup(content, "html.parser")
+
+  name = soup.find('title').text.split(' by')[0]
+  price = soup.find('span', {'class' : 'price'}).text
+  if soup.find('div', attrs={'data-testid': 'thumbnail-sticker'}) != None:
+    status = 'unavailable'
+  else:
+    status = 'available'
+  
+  img_link = soup.select('img[alt="Thumbnail of "]')[0].get('src').split('?')[0]
+  
+  return {'name': name,'price': price, 'status': status, 'image_link': img_link}
+
 def Scrape(url, website):
   if website == "mercari us":
     return ScrapeMercariUS(url)
+  elif website == "mercari jp":
+    return ScrapeMercariJP(url)
   else:
     raise NotImplementedError 
