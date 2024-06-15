@@ -1,5 +1,7 @@
 import './App.css';
 import { Button, Grid, GridItem} from '@chakra-ui/react'
+import { Link, Routes, Route } from 'react-router-dom';
+import Items from './Items';
 
 function Navigation() {
   return(
@@ -9,7 +11,9 @@ function Navigation() {
       </GridItem>
       <GridItem colStart={4}>
         <Button>
-          Items
+          <Link to="items">
+            Items
+          </Link>
         </Button>
       </GridItem>
       <GridItem>
@@ -21,15 +25,31 @@ function Navigation() {
   )
 }
 
-function App() {
-  return (
+function Home() {
+  return(
     <Grid templateAreas={`"header header"
                           "nav main"
-                          "nav footer"`}>
-      <GridItem>
+                          "nav footer"`}
+    >
+      <GridItem area={'header'}>
         <Navigation />
       </GridItem>
+      <GridItem area={'body'}>
+        
+      </GridItem>
     </Grid>
+  )
+}
+
+function App() {
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/items" element={<Items />} />
+      </Routes>
+    </>
+    
   );
 }
 
