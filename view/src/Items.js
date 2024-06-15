@@ -4,8 +4,8 @@ import './App'
 import axios from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { Button, Card, CardHeader, Heading, Image, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, SimpleGrid, Spinner, useToast, CardBody, Text, CardFooter, Tooltip } from '@chakra-ui/react';
-import { AddIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import { Button, Card, CardHeader, MenuGroup, Heading, IconButton, Image, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, SimpleGrid, Spinner, useToast, CardBody, Text, CardFooter, Tooltip, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, PopoverHeader, UnorderedList, ListItem, ListIcon, List, Icon, Center, Menu, MenuList, MenuItem, MenuButton, Flex, position } from '@chakra-ui/react';
+import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { Home } from './App';
 
 function parseWebsite(url) {
@@ -20,37 +20,62 @@ function parseWebsite(url) {
   return split[1]
 }
 
+function ItemOptions({name, link}) {
+  return(
+    <Menu isLazy>
+      <MenuButton
+        as={IconButton}
+        aria-label='Options'
+        icon={<EditIcon />}
+        variant='ghost'
+        sx={{position:'relative', left:'48%'}}
+      />
+    <MenuList>
+        <MenuItem icon={<DeleteIcon />}>
+          Delete
+        </MenuItem>
+        <MenuItem icon={<AddIcon />}>
+          Add to Wishlist
+        </MenuItem>
+        <MenuItem icon={<ExternalLinkIcon />} as='a' href={link} target='_blank'>
+          Go to original page
+        </MenuItem>
+    </MenuList>
+    </Menu>
+  )
+}
+
 function createList(items) {
   var list = []
   for (let i = 0; i < items.length; i++) {
     console.log(items[i])
     list.push(
       <Card variant='outline'>
-        <CardHeader align='center' pb={0}>
-          <Image src={items[i].image_link} boxSize='150px' mb={2}/> 
-          <Heading size='xs'>
-            <Tooltip label={items[i].name} hasArrow>
-              <Text noOfLines={2} pb={1}>
-                {items[i].name}
-              </Text>
-            </Tooltip>
-           
-          </Heading>
+        <CardHeader align='center' pb={0} pt={1}>
+          <ItemOptions 
+            name={items[i].name} 
+            link={items[i].link}
+          />
+            <Image src={items[i].image_link} boxSize='150px' mb={2}/> 
+            <Heading size='s'>
+              <Tooltip label={items[i].name} hasArrow>
+                <Text noOfLines={2} pb={1}>
+                  {items[i].name}
+                </Text>
+              </Tooltip>
+            </Heading>
         </CardHeader>  
-        <CardBody align='left' pb={0}>
+        <CardBody align='center' pb={5} pt={2}>
           <Text fontSize='l'>
             {items[i].website === "mercari us" ? "¥" : "$" }
             {items[i].price.toFixed(2)}
           </Text>
         </CardBody>
-        <Button variant='link' as='a' href={items[i].link} target="_blank">
-          <ExternalLinkIcon />
-        </Button>
       </Card>
     )
   }
   return (
-    <SimpleGrid spacing={3} templateColumns='repeat(auto-fill, minmax(240px, 1fr))'>
+    <SimpleGrid spacing={4} columns={5}>
       {list}
     </SimpleGrid>
   )
@@ -59,13 +84,13 @@ function createList(items) {
 function AddItem() {
   const {isOpen, onOpen, onClose} = useDisclosure()
   const [url, setURL] = React.useState('')
-  const [isScraping, setIsScraping] = React.useState(false)
+  const [isLoading , setIsLoading] = React.useState(false)
   const toast = useToast()
 
   const handleSubmit = async event => {
     event.preventDefault()
     console.log('in handleSubmit')
-    setIsScraping(true)
+    setIsLoading(true)
     axios.post('/api/items/', {
       link: url,
       website: parseWebsite(url)
@@ -90,36 +115,37 @@ function AddItem() {
           isClosable: true,
         })
       }
-      setIsScraping(false)
+      setIsLoading(false)
     })
   };
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme='blue' size='lg' sx={
-        {
-          borderRadius:'50%', 
-          p:'0',
-          position:'fixed',
-          right:'1%',
-          bottom:'2%',
-          zIndex:'2'
-        }
-      }>
         <Tooltip label="Add item to database" hasArrow placement='top-start'>
-          <AddIcon />
+          <IconButton
+            onClick={onOpen} 
+            isRound 
+            size='lg' 
+            icon={<AddIcon />} 
+            colorScheme='blue'
+            sx={{
+              p:'0',
+              position:'fixed',
+              right:'1%',
+              bottom:'2%',
+              zIndex:'2'
+            }} 
+          />
         </Tooltip>
-      </Button>
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Add Item</ModalHeader>
-          { isScraping ? <ModalCloseButton isDisabled={true} /> : <ModalCloseButton />}
-          
+          { isLoading ? <ModalCloseButton isDisabled={true} /> : <ModalCloseButton />}
           <ModalBody>
             <FormControl isRequired>
               <FormLabel>URL</FormLabel>
-              <Input placeholder='Enter URL' isDisabled={isScraping} onChange={event => setURL(event.currentTarget.value)}/>
+              <Input placeholder='Enter URL' isDisabled={isLoading} onChange={event => setURL(event.currentTarget.value)}/>
               <FormHelperText>
                 We'll scrape all the needed information from the URL you entered and add it onto our database.
               </FormHelperText>
@@ -127,15 +153,16 @@ function AddItem() {
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme='gray' mr={3} onClick={onClose} isDisabled={isScraping}>Close</Button>
-            { isScraping ? 
-              <>
-                <Button colorScheme='blue' type="submit" onClick={handleSubmit} isDisabled={isScraping}>
-                  <Spinner sx={{'m': 1}} />
-                </Button> 
-              </>: 
-              <Button colorScheme='blue' type="submit" onClick={handleSubmit}>Submit</Button> 
-            }
+            <Button colorScheme='gray' mr={3} onClick={onClose} isDisabled={isLoading}>Close</Button>
+            {console.log(isLoading)}
+            <Button 
+              colorScheme='blue' 
+              type='submit' 
+              onClick={handleSubmit} 
+              isLoading={isLoading}
+              loadingText='Submitting'>
+                Submit
+              </Button> 
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -166,7 +193,7 @@ function Items() {
 
   return(
     <Home body={
-      <ItemsBody items={items} />
+        <ItemsBody items={items} />
       } 
     />
   )
