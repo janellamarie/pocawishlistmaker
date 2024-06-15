@@ -1,5 +1,5 @@
 import './App.css';
-import axios from 'axios';
+import axios, { isCancel } from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { Button, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, Spinner, useToast } from '@chakra-ui/react';
@@ -96,7 +96,7 @@ function AddItem() {
             <Button colorScheme='gray' mr={3} onClick={onClose} isDisabled={isScraping}>Close</Button>
             { isScraping ? 
               <>
-                <Button colorScheme='blue' type="submit" onClick={handleSubmit} isDisabled={true}>
+                <Button colorScheme='blue' type="submit" onClick={handleSubmit} isDisabled={isScraping}>
                   <Spinner sx={{'m': 1}} />
                 </Button> 
               </>: 
