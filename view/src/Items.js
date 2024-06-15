@@ -20,7 +20,36 @@ function parseWebsite(url) {
   return split[1]
 }
 
-function ItemOptions({name, link}) {
+function ItemOptions({id, link}) {
+  const toast = useToast()
+  const handleItemDelete = async event => {
+    event.preventDefault()
+    console.log('deleteing', id, '...')
+    let url = '/api/items/' + id
+    axios.delete(url).then(response => {
+      console.log(response.status)
+      if (response.status === 204) {
+        console.log("successful request")
+        toast({
+          title: 'Success!',
+          description: "Successfully deleted item from database.",
+          status: 'success',
+          duration: 9000,
+          isClosable: true,
+        })
+      } else {
+        console.log("error encountered")
+        toast({
+          title: 'Error!',
+          description: "Unable to delete item from database.",
+          status: 'error',
+          duration: 9000,
+          isClosable: true,
+        })
+      }
+    })
+  };
+
   return(
     <Menu isLazy>
       <MenuButton
@@ -31,7 +60,7 @@ function ItemOptions({name, link}) {
         sx={{position:'relative', left:'48%'}}
       />
     <MenuList>
-        <MenuItem icon={<DeleteIcon />}>
+        <MenuItem icon={<DeleteIcon />} onClick={handleItemDelete}>
           Delete
         </MenuItem>
         <MenuItem icon={<AddIcon />}>
@@ -53,11 +82,12 @@ function createList(items) {
       <Card variant='outline'>
         <CardHeader align='center' pb={0} pt={1}>
           <ItemOptions 
-            name={items[i].name} 
+            id={items[i].id}
             link={items[i].link}
           />
             <Image src={items[i].image_link} boxSize='150px' mb={2}/> 
             <Heading size='s'>
+              <span className='id' style={{display:'none'}}>{items[i].id}</span>
               <Tooltip label={items[i].name} hasArrow>
                 <Text noOfLines={2} pb={1}>
                   {items[i].name}
