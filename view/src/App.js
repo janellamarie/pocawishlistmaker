@@ -25,17 +25,21 @@ function Navigation() {
   )
 }
 
-function Home() {
+export function Home({body}) {
   return(
-    <Grid templateAreas={`"header header"
-                          "nav main"
-                          "nav footer"`}
+    <Grid 
+      templateAreas={`"header"
+        "main"
+        "footer"`}
+      gridTemplateRows={'7vh 1fr 5vh'}
+      gridTemplateColumns={'1fr'}
+      gap='1'
     >
-      <GridItem area={'header'}>
+      <GridItem pl='2' area={'header'}>
         <Navigation />
       </GridItem>
-      <GridItem area={'body'}>
-        
+      <GridItem pl='2' area={'main'}>
+        {body}
       </GridItem>
     </Grid>
   )

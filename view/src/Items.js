@@ -1,9 +1,12 @@
 import './App.css';
+import './App'
+
 import axios from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { Button, Card, CardHeader, Heading, Image, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, SimpleGrid, Spinner, useToast, CardBody, Text, CardFooter } from '@chakra-ui/react';
-import { ExternalLinkIcon } from '@chakra-ui/icons'
+import { Button, Card, CardHeader, Heading, Image, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, SimpleGrid, Spinner, useToast, CardBody, Text, CardFooter, Tooltip } from '@chakra-ui/react';
+import { AddIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import { Home } from './App';
 
 function parseWebsite(url) {
   const split = url.split('.')
@@ -26,7 +29,12 @@ function createList(items) {
         <CardHeader align='center' pb={0}>
           <Image src={items[i].image_link} boxSize='150px' mb={2}/> 
           <Heading size='xs'>
-            {items[i].name}
+            <Tooltip label={items[i].name} hasArrow>
+              <Text noOfLines={2} pb={1}>
+                {items[i].name}
+              </Text>
+            </Tooltip>
+           
           </Heading>
         </CardHeader>  
         <CardBody align='left' pb={0}>
@@ -88,7 +96,20 @@ function AddItem() {
 
   return (
     <>
-      <Button onClick={onOpen}>Add Item</Button>
+      <Button onClick={onOpen} colorScheme='blue' size='lg' sx={
+        {
+          borderRadius:'50%', 
+          p:'0',
+          position:'fixed',
+          left:'95%',
+          top:'90%',
+          zIndex:'2'
+        }
+      }>
+        <Tooltip label="Add item to database" hasArrow placement='top-start'>
+          <AddIcon />
+        </Tooltip>
+      </Button>
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
@@ -125,8 +146,8 @@ function AddItem() {
 function ItemsBody({items}) {
   return(
     <>
-      <AddItem />
       {createList(items)}
+      <AddItem />
     </>
   )
 }
@@ -144,9 +165,10 @@ function Items() {
   }, []);
 
   return(
-    <>
+    <Home body={
       <ItemsBody items={items} />
-    </>
+      } 
+    />
   )
 }
 
