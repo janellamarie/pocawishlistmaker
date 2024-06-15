@@ -2,7 +2,7 @@ import './App.css';
 import axios from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { Button, Input, FormLabel, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, Spinner, useToast } from '@chakra-ui/react';
+import { Button, Input, FormLabel, FormHelperText, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, Spinner, useToast } from '@chakra-ui/react';
 
 function parseWebsite(url) {
   const split = url.split('.')
@@ -86,6 +86,9 @@ function AddItem() {
             <FormControl isRequired>
               <FormLabel>URL</FormLabel>
               <Input placeholder='Enter URL' isDisabled={isScraping} onChange={event => setURL(event.currentTarget.value)}/>
+              <FormHelperText>
+                We'll scrape all the needed information from the URL you entered and add it onto our database.
+              </FormHelperText>
             </FormControl>
           </ModalBody>
 
