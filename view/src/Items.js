@@ -101,8 +101,8 @@ function AddItem() {
           borderRadius:'50%', 
           p:'0',
           position:'fixed',
-          left:'95%',
-          top:'90%',
+          right:'1%',
+          bottom:'2%',
           zIndex:'2'
         }
       }>
