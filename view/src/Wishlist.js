@@ -2,14 +2,14 @@ import * as React from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-import { AddIcon, SearchIcon } from "@chakra-ui/icons"
+import { AddIcon, EditIcon, DeleteIcon, ExternalLinkIcon, SearchIcon } from "@chakra-ui/icons"
 import { 
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
-  Flex, SimpleGrid,
-  Image,
-  Badge
+  Flex, SimpleGrid, Image, Menu, MenuList, MenuButton, MenuItem,
+  Link,
+  Container
 } from "@chakra-ui/react"
 
 export function Wishlists() {
@@ -140,6 +140,55 @@ export function Wishlists() {
     )
   }
 
+  function WishlistOptions({id}) {
+    const toast = useToast()
+    const handleWishlistDelete = async event => {
+      console.log('deleting', id, '...')
+      let url = '/api/wishlists/' + id + '/'
+      axios.delete(url).then(response => {
+        if (response.status >= 200) {
+          console.log("successful request")
+          getAllWishlists()
+          toast({
+            title: 'Success!',
+            description: "Successfully deleted item from database.",
+            status: 'success',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
+        } else {
+          console.error("error encountered")
+          toast({
+            title: 'Error!',
+            description: "Unable to delete item from database.",
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
+      })
+    };
+
+    return(
+      <Menu isLazy>
+        <MenuButton
+          as={IconButton}
+          aria-label='Edit wishlist'
+          icon={<EditIcon />}
+          size='md'
+          variant='solid'
+        />
+        <MenuList>
+          <MenuItem icon={<DeleteIcon />} onClick={handleWishlistDelete}>
+            Delete
+          </MenuItem>
+        </MenuList>
+      </Menu>
+    )
+  }
+
   function createWishlistList(wishlists) {
     function handleWishlistClick(event) {
       setSelectedWishlist(Number(event.target['offsetParent'].id))
@@ -148,22 +197,26 @@ export function Wishlists() {
     var list = []
     for (let i = 0; i < wishlists.length; i++) {
       var temp = 
-        <Card 
-          w='full' 
-          mt={0} 
-          mb={0} 
-          backgroundColor={selectedWishlist === i ? 'yellow.100' : 'white'}
-          id={i}
-          onClick={event => handleWishlistClick(event)}
-        >
+          <Card 
+            w='full'
+            mt={0} 
+            as={Link}
+            mb={0} 
+            id={i}
+            backgroundColor={selectedWishlist === i ? 'yellow.100' : 'white'}
+            onClick={event => handleWishlistClick(event)}
+          >
           <CardHeader pb='0'>
-            <Heading size='s'>{wishlists[i].name}</Heading>
+            <Flex justifyContent='space-between'>
+              <Heading size='s'>{wishlists[i].name}</Heading>
+            </Flex>
           </CardHeader>
           <CardBody pt='1%'>
             <Text fontSize='xs'>Tags</Text>
             {/* TODO: add Tags here */ }
           </CardBody>
         </Card>
+       
       list.push(temp)
     }
 
@@ -224,8 +277,7 @@ export function Wishlists() {
           </CardHeader>  
           <CardBody align='center' pb={5} pt={2}>
             <Text fontSize='l'>
-              {items[i].website === "mercari us" ? "$" : "¥" }
-              {items[i].price.toFixed(2)}
+              ${items[i].price.toFixed(2)}
             </Text>
           </CardBody>
         </Card>
@@ -233,18 +285,48 @@ export function Wishlists() {
     }
 
     return (
-      <SimpleGrid spacing={4} columns={5}>
+      <SimpleGrid spacing={4} columns={5} pt={2}>
         {list}
       </SimpleGrid>
+    )
+  }
+
+  function WishlistDetails({wishlist}) {
+    return (
+      <Box 
+        w='full' 
+        textAlign='left' 
+        backgroundColor='gray.100' 
+        p={2} 
+        // borderBottomColor='black' 
+        // borderBottom='1px'
+      >
+        <Flex justifyContent='space-between'>
+          <Heading>
+            {wishlist.name}
+          </Heading>
+          <WishlistOptions id={wishlist.id} />
+        </Flex>
+
+        {wishlist.description !== '' ? 
+          <>
+            <Divider p={1} />
+            <Heading size='md' pb={1} pt={2}>Description</Heading>
+            <Text textAlign='left'>{wishlist.description}</Text>
+          </>
+          : <Box></Box>}
+        
+      </Box>
     )
   }
 
   return (
     <Grid 
       templateAreas={`"list main"`}
-      gridTemplateColumns={'32% 1fr'}
+      gridTemplateRows={'100%'}
+      gridTemplateColumns={'25% 74%'}
     >
-      <GridItem area={'list'} backgroundColor='blue.200' p={2}>
+      <GridItem area={'list'} bg='blue.200' p={2}>
         <Box>
           <Flex justifyContent='space-between' alignItems='center'>
             <Heading>Wishlists</Heading>
@@ -257,13 +339,15 @@ export function Wishlists() {
             </InputRightElement>
           </InputGroup>
         </Box>
-        <Divider/>
         <VStack>
           {createWishlistList(wishlists)}
         </VStack>
         
       </GridItem>
       <GridItem area={'main'} pl={2} pt={2}>
+        {wishlists.length !== 0 ? 
+          <WishlistDetails wishlist={wishlists[selectedWishlist]} /> : <Box></Box>
+        }
         {wishlists.length !== 0 ? 
           createItemList(wishlists[selectedWishlist]['items']) : <Box></Box>
         }
