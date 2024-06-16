@@ -115,7 +115,7 @@ function Items() {
               id={items[i].id}
               link={items[i].link}
             />
-              <Image src={items[i].image_link} boxSize='150px' mb={2}/> 
+              <Image src={items[i].image_link} boxSize='150px' mb={2} objectFit='cover' /> 
               <Heading size='s'>
                 <span className='id' style={{display:'none'}}>{items[i].id}</span>
                 <Tooltip label={items[i].name} hasArrow>
