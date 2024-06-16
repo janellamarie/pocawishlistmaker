@@ -6,9 +6,9 @@ import { AddIcon, SearchIcon } from "@chakra-ui/icons"
 import { 
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
-  ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text,
-  Card, CardHeader, CardBody,
-  Flex
+  ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
+  Flex, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, SimpleGrid,
+  Image
 } from "@chakra-ui/react"
 
 export function Wishlists() {
@@ -18,11 +18,11 @@ export function Wishlists() {
   useEffect(() => {
     const asyncCall = async () => {
       const result = await axios.get("/api/wishlists/")
-      setWishlists(result.data);
+      setWishlists(result.data)
+      console.log('result.data', result.data)
     }
     asyncCall();
   }, []);
-
 
   function getAllWishlists() {
     console.log("fetching items...")
@@ -139,11 +139,22 @@ export function Wishlists() {
     )
   }
 
-  function createList(wishlists) {
+  function createWishlistList(wishlists) {
+    function handleWishlistClick(event) {
+      setSelectedWishlist(Number(event.target['offsetParent'].id))
+    }
+
     var list = []
     for (let i = 0; i < wishlists.length; i++) {
-      list.push(
-        <Card w='full' mt={0} mb={0}>
+      var temp = 
+        <Card 
+          w='full' 
+          mt={0} 
+          mb={0} 
+          backgroundColor={selectedWishlist === i ? 'yellow.100' : 'white'}
+          id={i}
+          onClick={event => handleWishlistClick(event)}
+        >
           <CardHeader pb='0'>
             <Heading size='s'>{wishlists[i].name}</Heading>
           </CardHeader>
@@ -152,10 +163,80 @@ export function Wishlists() {
             {/* TODO: add Tags here */ }
           </CardBody>
         </Card>
-      )
+      list.push(temp)
     }
 
     return list
+  }
+
+  function ItemOptions({id, link}) {
+    const toast = useToast()
+    const handleItemDelete = async event => {
+      console.log('deleting', id, '...')
+      let url = '/api/items/' + id
+      axios.delete(url).then(response => {
+        if (response.status >= 200) {
+          console.log("successful request")
+          // getAllItems()
+          toast({
+            title: 'Success!',
+            description: "Successfully deleted item from database.",
+            status: 'success',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
+        } else {
+          console.error("error encountered")
+          toast({
+            title: 'Error!',
+            description: "Unable to delete item from database.",
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
+      })
+    };
+  }
+
+  function createItemList(items) {
+    var list = []
+    for (let i = 0; i < items.length; i++) {
+      // console.log(items[i])
+      list.push(
+        <Card variant='outline'>
+          <CardHeader align='center' pb={0} pt={1}>
+            <ItemOptions 
+              id={items[i].id}
+              link={items[i].link}
+            />
+              <Image src={items[i].image_link} boxSize='150px' mb={2} objectFit='cover' /> 
+              <Heading size='s'>
+                <span className='id' style={{display:'none'}}>{items[i].id}</span>
+                <Tooltip label={items[i].name} hasArrow>
+                  <Text noOfLines={2} pb={1}>
+                    {items[i].name}
+                  </Text>
+                </Tooltip>
+              </Heading>
+          </CardHeader>  
+          <CardBody align='center' pb={5} pt={2}>
+            <Text fontSize='l'>
+              {items[i].website === "mercari us" ? "$" : "¥" }
+              {items[i].price.toFixed(2)}
+            </Text>
+          </CardBody>
+        </Card>
+      )
+    }
+
+    return (
+      <SimpleGrid spacing={4} columns={5}>
+        {list}
+      </SimpleGrid>
+    )
   }
 
   return (
@@ -178,12 +259,14 @@ export function Wishlists() {
         </Box>
         <Divider/>
         <VStack>
-          {createList(wishlists)}
+          {createWishlistList(wishlists)}
         </VStack>
         
       </GridItem>
-      <GridItem area={'main'}>
-
+      <GridItem area={'main'} pl={2} pt={2}>
+        {wishlists.length !== 0 ? 
+          createItemList(wishlists[selectedWishlist]['items']) : <Box></Box>
+        }
       </GridItem>
     </Grid>
   )
