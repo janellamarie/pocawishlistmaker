@@ -36,13 +36,16 @@ class ItemView(viewsets.ModelViewSet):
       raise Exception
 
 class WishlistView(viewsets.ModelViewSet):
-  queryset = Wishlists.objects.all()
+  queryset = Wishlists.objects.all().order_by('id')
 
   filter_backends = [filters.SearchFilter]
   search_fields = ['name']
   
   def get_serializer_class(self):
+    print("[WishlistView.get_serializer_class]", self.action)
     if self.action == 'create' or self.action == 'post':
       return CreateWishlistSerializer
-    elif self.action == 'list':
+    elif self.action == 'update' or self.action == 'partial_update':
+      return UpdateWishlistSerializer
+    else:
       return WishlistSerializer

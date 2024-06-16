@@ -129,7 +129,11 @@ function Items() {
 
   function Item({id, name, link, website, price, image_link}) {
     const {isOpen: isAddToWishlistOpen, onOpen: onAddToWishlistOpen, onClose: onAddToWishlistClose} = useDisclosure()
-    
+    const toast = useToast()
+    const [itemID, setItemID] = React.useState(0)
+    const [wishlistID, setWishlistID] = React.useState(0)
+    const [isAddToWishlistLoading, setIsAddToWishlistLoading] = React.useState(false)
+
     function parseWishlistNames(wishlists) {
       var names = {}
       for (const value of wishlists) {
@@ -146,6 +150,58 @@ function Items() {
         )
       }
       return list
+    }
+
+    const handleAddToWishlistSelectChange = event => {
+      setWishlistID(event.target.selectedOptions[0].value)
+      setItemID(event.target.id)
+    }
+
+    const handleAddToWishlistSubmit = async event => {
+      event.preventDefault()
+      var url = '/api/wishlists/' + wishlistID + '/'
+      console.log('[handleAddToWishlistSubmit.url]', url, '\n[handleAddToWishlistSubmit.itemID]', itemID)
+      setIsAddToWishlistLoading(true)
+      try {
+        axios.put(url, {
+          items: [Number(itemID)]
+        }).then(response => {
+          if (response.statusText === 'OK') {
+            console.log("[handleAddItemSubmit] success")
+            setIsAddToWishlistLoading(false)
+            toast({
+              title: 'Success!',
+              description: "Successfully add item to wishlist.",
+              status: 'success',
+              duration: 4000,
+              isClosable: true,
+              position: 'top'
+            })
+          } else {
+            console.error("[handleAddItemSubmit] error encountered")
+            setIsAddToWishlistLoading(false)
+            toast({
+              title: 'Error!',
+              description: "An error occured whie trying to add the item to the database.",
+              status: 'error',
+              duration: 4000,
+                isClosable: true,
+                position: 'top'
+            })
+          }
+        })
+      } catch(error) {
+        console.error("[handleAddItemSubmit] error encountered")
+        setIsAddToWishlistLoading(false)
+        toast({
+          title: 'Error!',
+          description: "An error occured whie trying to add the item to the database.",
+          status: 'error',
+          duration: 4000,
+            isClosable: true,
+            position: 'top'
+        })
+      }      
     }
 
     return (
@@ -170,24 +226,32 @@ function Items() {
                 <ModalOverlay />
                 <ModalContent>
                   <ModalHeader>Add to Wishlist</ModalHeader>
-                  <ModalCloseButton />
+                  <ModalCloseButton isDisabled={isAddToWishlistLoading} />
                   <ModalBody>
                     <FormControl isRequired>
                       <FormLabel>Wishlist</FormLabel>
-                      <Select placeholder='Select a wishlist'>
+                      <Select 
+                        placeholder='Select a wishlist' 
+                        id={id} 
+                        onChange={handleAddToWishlistSelectChange}
+                        isDisabled={isAddToWishlistLoading}
+                      >
                         {createWishlistNamesOptions(parseWishlistNames(wishlists.values()))}
                       </Select>
                     </FormControl>
                   </ModalBody>
           
                   <ModalFooter>
-                    <Button colorScheme='gray' mr={3} onClick={onAddToWishlistClose}>
+                    <Button colorScheme='gray' mr={3} onClick={onAddToWishlistClose} isDisabled={isAddToWishlistLoading}>
                       Close
                     </Button>
                     <Button 
                       colorScheme='blue' 
-                      type='submit'>
-                        Submit
+                      type='submit'
+                      onClick={handleAddToWishlistSubmit}
+                      isLoading={isAddToWishlistLoading}
+                      loadingText='Adding'>
+                        Add to Wishlist
                     </Button>
                   </ModalFooter>
                 </ModalContent>
@@ -198,10 +262,9 @@ function Items() {
     )
   }
 
-  function createList(items) {
+  function createItemList(items) {
     var list = []
     for (let i = 0; i < items.length; i++) {
-      // console.log(items[i])
       list.push(
         <Item 
           id={items[i].id} 
@@ -213,29 +276,26 @@ function Items() {
         />
       )
     }
-    return (
-      <SimpleGrid spacing={4} columns={5}>
-        {list}
-      </SimpleGrid>
-    )
+
+    return list
   }
 
   function AddItemButton() {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [url, setURL] = React.useState('')
-    const [isLoading , setIsLoading] = React.useState(false)
+    const [isAddItemSubmitLoading , setIsAddItemSubmitLoading] = React.useState(false)
     const toast = useToast()
   
-    const handleSubmit = async event => {
+    const handleAddItemSubmit = async event => {
       event.preventDefault()
-      setIsLoading(true)
+      setIsAddItemSubmitLoading(true)
       try {
         axios.post('/api/items/', {
           link: url,
           website: parseWebsite(url)
         }).then(response => {
           if (response.status >= 200) {
-            console.log("[handleSubmit] successful request")
+            console.log("[handleAddItemSubmit] successful request")
             getAllItems()
             toast({
               title: 'Success!',
@@ -245,8 +305,9 @@ function Items() {
               isClosable: true,
               position: 'top'
             })
+            setIsAddItemSubmitLoading(false)
           } else {
-            console.error("[handleSubmit] error encountered")
+            console.error("[handleAddItemSubmit] error encountered")
             toast({
               title: 'Error!',
               description: "An error occured whie trying to add the item to the database.",
@@ -255,7 +316,7 @@ function Items() {
               isClosable: true,
               position: 'top'
             })
-            setIsLoading(false)
+            setIsAddItemSubmitLoading(false)
           }
         })
       } catch(error) {
@@ -268,37 +329,37 @@ function Items() {
           isClosable: true,
           position: 'top'
         })
-        setIsLoading(false)
+        setIsAddItemSubmitLoading(false)
       }
     };
   
     return (
       <>
-          <Tooltip label="Add item to database" hasArrow placement='top-start'>
-            <IconButton
-              onClick={onOpen} 
-              isRound 
-              size='lg' 
-              icon={<AddIcon />} 
-              colorScheme='blue'
-              sx={{
-                p:'0',
-                position:'fixed',
-                right:'1%',
-                bottom:'2%',
-                zIndex:'2'
-              }} 
-            />
-          </Tooltip>
+        <Tooltip label="Add item to database" hasArrow placement='top-start'>
+          <IconButton
+            onClick={onOpen} 
+            isRound 
+            size='lg' 
+            icon={<AddIcon />} 
+            colorScheme='blue'
+            sx={{
+              p:'0',
+              position:'fixed',
+              right:'1%',
+              bottom:'2%',
+              zIndex:'2'
+            }} 
+          />
+        </Tooltip>
         <Modal isOpen={isOpen} onClose={onClose} isCentered>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Add Item</ModalHeader>
-            { isLoading ? <ModalCloseButton isDisabled={true} /> : <ModalCloseButton />}
+            { isAddItemSubmitLoading ? <ModalCloseButton isDisabled={true} /> : <ModalCloseButton />}
             <ModalBody>
               <FormControl isRequired>
                 <FormLabel>URL</FormLabel>
-                <Input placeholder='Enter URL' isDisabled={isLoading} onChange={event => setURL(event.currentTarget.value)}/>
+                <Input placeholder='Enter URL' isDisabled={isAddItemSubmitLoading} onChange={event => setURL(event.currentTarget.value)}/>
                 <FormHelperText>
                   We'll scrape all the needed information from the URL you entered and add it onto our database.
                 </FormHelperText>
@@ -306,15 +367,15 @@ function Items() {
             </ModalBody>
   
             <ModalFooter>
-              <Button colorScheme='gray' mr={3} onClick={onClose} isDisabled={isLoading}>Close</Button>
+              <Button colorScheme='gray' mr={3} onClick={onClose} isDisabled={isAddItemSubmitLoading}>Close</Button>
               <Button 
                 colorScheme='blue' 
                 type='submit' 
-                onClick={handleSubmit} 
-                isLoading={isLoading}
+                onClick={handleAddItemSubmit} 
+                isLoading={isAddItemSubmitLoading}
                 loadingText='Submitting'>
                   Submit
-                </Button> 
+              </Button> 
             </ModalFooter>
           </ModalContent>
         </Modal>
@@ -323,10 +384,12 @@ function Items() {
   }
   
   function ItemsBody({items}) {
-    const {isOpen, onOpen, onClose} = useDisclosure()
     return(
       <>
-        {createList(items, isOpen, onOpen, onClose)}
+        <SimpleGrid spacing={4} columns={5}>
+          {createItemList(items)}
+        </SimpleGrid>
+        
         <AddItemButton />
       </>
     )
