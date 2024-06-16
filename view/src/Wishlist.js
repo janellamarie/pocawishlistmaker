@@ -20,6 +20,7 @@ export function Wishlists() {
     }
     asyncCall();
   }, []);
+
   
   function CreateWishlistButton() {
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -134,8 +135,9 @@ export function Wishlists() {
   function createList(wishlists) {
     var list = []
     for (let i = 0; i < wishlists.length; i++) {
+      console.log(wishlists[i])
       list.push(
-        <Card w='full'>
+        <Card w='full' mt={0} mb={0}>
           <CardHeader pb='0'>
             <Heading size='s'>{wishlists[i].name}</Heading>
           </CardHeader>
@@ -151,14 +153,15 @@ export function Wishlists() {
   }
 
   return (
-    <Grid templateAreas={`"list main"`}
-      gridTemplateColumns={'30% 1fr'}
+    <Grid 
+      templateAreas={`"list main"`}
+      gridTemplateColumns={'32% 1fr'}
     >
       <CreateWishlistButton />
-      <GridItem area={'list'} backgroundColor='blue.200'>
+      <GridItem area={'list'} backgroundColor='blue.200' p={1}>
         <Box>
           <Heading>Wishlists</Heading>
-          <InputGroup>
+          <InputGroup mt={1} mb={1}>
             <Input placeholder='Search' variant='filled' />
             <InputRightElement>
               <IconButton icon={<SearchIcon />} size='sm'/>

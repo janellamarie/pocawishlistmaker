@@ -128,7 +128,7 @@ function Items() {
           </CardHeader>  
           <CardBody align='center' pb={5} pt={2}>
             <Text fontSize='l'>
-              {items[i].website === "mercari us" ? "¥" : "$" }
+              {items[i].website === "mercari us" ? "$" : "¥" }
               {items[i].price.toFixed(2)}
             </Text>
           </CardBody>

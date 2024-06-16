@@ -1,14 +1,21 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters
+
+from django.shortcuts import get_object_or_404
+
 from pocawishlistmaker.scraper import Scrape
 from .serializers import *
 from .models import Items, Wishlists
 
-# Create your views here.
-
 class ItemView(viewsets.ModelViewSet):
   queryset = Items.objects.all()
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+  filterset_fields = ['website']
+  search_fields = ['name', 'website']
+  ordering_fields = ['name', 'id']
   
   def get_serializer_class(self):
     if self.action == 'create':
@@ -31,8 +38,11 @@ class ItemView(viewsets.ModelViewSet):
 class WishlistView(viewsets.ModelViewSet):
   queryset = Wishlists.objects.all()
 
+  filter_backends = [filters.SearchFilter]
+  search_fields = ['name']
+  
   def get_serializer_class(self):
-    if self.action == 'create':
+    if self.action == 'create' or self.action == 'post':
       return CreateWishlistSerializer
-    else:
+    elif self.action == 'list':
       return WishlistSerializer

@@ -12,6 +12,7 @@ class CreateItemSerializer(serializers.ModelSerializer):
     fields = ('link', 'website')
 
 class WishlistSerializer(serializers.ModelSerializer):
+  items = ItemSerializer(many=True, read_only=True)
   class Meta:
     model = Wishlists
     fields = '__all__'
