@@ -7,7 +7,8 @@ import { useEffect } from 'react';
 import { 
   Button, Card, CardHeader, FormLabel, FormHelperText, Heading, IconButton, Image, Input,  Modal, ModalBody, 
   ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, 
-  SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton 
+  SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton, 
+  CardFooter
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { Home } from './App';
@@ -93,9 +94,6 @@ function Items() {
           <MenuItem icon={<DeleteIcon />} onClick={handleItemDelete}>
             Delete
           </MenuItem>
-          <MenuItem icon={<AddIcon />}>
-            Add to Wishlist
-          </MenuItem>
           <MenuItem icon={<ExternalLinkIcon />} as='a' href={link} target='_blank'>
             Go to original page
           </MenuItem>
@@ -103,35 +101,83 @@ function Items() {
       </Menu>
     )
   }
-  
+
+  function ItemHeader({id, link, image_link, name}) {
+    return (
+      <>
+        <ItemOptions 
+            id={id}
+            link={link}
+          />
+            <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
+            <Heading size='s'>
+              <span className='id' style={{display:'none'}}>{id}</span>
+              <Tooltip label={name} hasArrow>
+                <Text noOfLines={2} pb={1}>
+                  {name}
+                </Text>
+                </Tooltip>
+              </Heading>
+      </>
+    )
+  }
+
+  function Item({id, name, link, website, price, image_link}) {
+    const {isOpen: isAddToWishlistOpen, onOpen: onAddToWishlistOpen, onClose: onAddToWishlistClose} = useDisclosure()
+
+    return (
+      <Card variant='outline'>
+        <CardHeader align='center' pb={0} pt={1}>
+          <ItemHeader id={id} link={link} image_link={image_link} name={name} />
+        </CardHeader>  
+        <CardBody align='center' pb={5} pt={2}>
+          <Text fontSize='l'>
+            {website === "mercari us" ? "$" : "¥" }
+            {price.toFixed(2)}
+          </Text>
+        </CardBody>
+        <CardFooter pt={0}>
+          <Button 
+            leftIcon={<AddIcon />} 
+            w='full' 
+            size='sm'
+            onClick={onAddToWishlistOpen}>
+              Add to Wishlist
+              <Modal isOpen={isAddToWishlistOpen} onClose={onAddToWishlistClose}>
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Modal Title</ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                  </ModalBody>
+          
+                  <ModalFooter>
+                    <Button colorScheme='blue' mr={3} onClick={onAddToWishlistClose}>
+                      Close
+                    </Button>
+                    <Button variant='ghost'>Secondary Action</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+          </Button>
+        </CardFooter>
+      </Card>
+    )
+  }
+
   function createList(items) {
     var list = []
     for (let i = 0; i < items.length; i++) {
       // console.log(items[i])
       list.push(
-        <Card variant='outline'>
-          <CardHeader align='center' pb={0} pt={1}>
-            <ItemOptions 
-              id={items[i].id}
-              link={items[i].link}
-            />
-              <Image src={items[i].image_link} boxSize='150px' mb={2} objectFit='cover' /> 
-              <Heading size='s'>
-                <span className='id' style={{display:'none'}}>{items[i].id}</span>
-                <Tooltip label={items[i].name} hasArrow>
-                  <Text noOfLines={2} pb={1}>
-                    {items[i].name}
-                  </Text>
-                </Tooltip>
-              </Heading>
-          </CardHeader>  
-          <CardBody align='center' pb={5} pt={2}>
-            <Text fontSize='l'>
-              {items[i].website === "mercari us" ? "$" : "¥" }
-              {items[i].price.toFixed(2)}
-            </Text>
-          </CardBody>
-        </Card>
+        <Item 
+          id={items[i].id} 
+          name={items[i].name} 
+          link={items[i].link} 
+          website={items[i].website} 
+          price={items[i].price} 
+          image_link={items[i].image_link}
+        />
       )
     }
     return (
@@ -244,9 +290,10 @@ function Items() {
   }
   
   function ItemsBody({items}) {
+    const {isOpen, onOpen, onClose} = useDisclosure()
     return(
       <>
-        {createList(items)}
+        {createList(items, isOpen, onOpen, onClose)}
         <AddItemButton />
       </>
     )
