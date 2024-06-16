@@ -8,7 +8,8 @@ import {
   Button, Card, CardHeader, FormLabel, FormHelperText, Heading, IconButton, Image, Input,  Modal, ModalBody, 
   ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, 
   SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton, 
-  CardFooter
+  CardFooter,
+  Select
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { Home } from './App';
@@ -27,14 +28,21 @@ function parseWebsite(url) {
 
 function Items() {
   const [items, setItems] = React.useState([]);
+  const [wishlists, setWishlists] = React.useState([]);
 
   useEffect(() => {
-    const asyncCall = async () => {
+    const asyncGetItems = async () => {
       const result = await axios.get("/api/items/")
       setItems(result.data);
     }
 
-    asyncCall();
+    const asyncGetWishlist = async () => {
+      const result = await axios.get("/api/wishlists/")
+      setWishlists(result.data);
+    }
+
+    asyncGetItems();
+    asyncGetWishlist();
   }, []);
 
   function getAllItems() {
@@ -105,25 +113,40 @@ function Items() {
   function ItemHeader({id, link, image_link, name}) {
     return (
       <>
-        <ItemOptions 
-            id={id}
-            link={link}
-          />
-            <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
-            <Heading size='s'>
-              <span className='id' style={{display:'none'}}>{id}</span>
-              <Tooltip label={name} hasArrow>
-                <Text noOfLines={2} pb={1}>
-                  {name}
-                </Text>
-                </Tooltip>
-              </Heading>
+        <ItemOptions id={id} link={link} />
+        <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
+        <Heading size='s'>
+          <span className='id' style={{display:'none'}}>{id}</span>
+          <Tooltip label={name} hasArrow>
+            <Text noOfLines={2} pb={1}>
+              {name}
+            </Text>
+          </Tooltip>
+        </Heading>
       </>
     )
   }
 
   function Item({id, name, link, website, price, image_link}) {
     const {isOpen: isAddToWishlistOpen, onOpen: onAddToWishlistOpen, onClose: onAddToWishlistClose} = useDisclosure()
+    
+    function parseWishlistNames(wishlists) {
+      var names = {}
+      for (const value of wishlists) {
+        names[value['id']] = value['name'];
+      }
+      return names
+    }
+
+    function createWishlistNamesOptions(wishlist) {
+      var list = []
+      for (const [key, value] of Object.entries(wishlist)) {
+        list.push(
+          <option value={key}>{value}</option>
+        )
+      }
+      return list
+    }
 
     return (
       <Card variant='outline'>
@@ -146,16 +169,26 @@ function Items() {
               <Modal isOpen={isAddToWishlistOpen} onClose={onAddToWishlistClose}>
                 <ModalOverlay />
                 <ModalContent>
-                  <ModalHeader>Modal Title</ModalHeader>
+                  <ModalHeader>Add to Wishlist</ModalHeader>
                   <ModalCloseButton />
                   <ModalBody>
+                    <FormControl isRequired>
+                      <FormLabel>Wishlist</FormLabel>
+                      <Select placeholder='Select a wishlist'>
+                        {createWishlistNamesOptions(parseWishlistNames(wishlists.values()))}
+                      </Select>
+                    </FormControl>
                   </ModalBody>
           
                   <ModalFooter>
-                    <Button colorScheme='blue' mr={3} onClick={onAddToWishlistClose}>
+                    <Button colorScheme='gray' mr={3} onClick={onAddToWishlistClose}>
                       Close
                     </Button>
-                    <Button variant='ghost'>Secondary Action</Button>
+                    <Button 
+                      colorScheme='blue' 
+                      type='submit'>
+                        Submit
+                    </Button>
                   </ModalFooter>
                 </ModalContent>
               </Modal>

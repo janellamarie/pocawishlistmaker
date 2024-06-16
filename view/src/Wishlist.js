@@ -7,7 +7,7 @@ import {
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
-  Flex, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon, SimpleGrid,
+  Flex, SimpleGrid,
   Image
 } from "@chakra-ui/react"
 
