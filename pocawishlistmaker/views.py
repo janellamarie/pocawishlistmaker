@@ -3,7 +3,7 @@ from rest_framework import viewsets
 
 from pocawishlistmaker.scraper import Scrape
 from .serializers import *
-from .models import Items
+from .models import Items, Wishlists
 
 # Create your views here.
 
@@ -27,3 +27,12 @@ class ItemView(viewsets.ModelViewSet):
     except Exception as e:
       print("Encountered exception...", e)
       raise Exception
+
+class WishlistView(viewsets.ModelViewSet):
+  queryset = Wishlists.objects.all()
+
+  def get_serializer_class(self):
+    if self.action == 'create':
+      return CreateWishlistSerializer
+    else:
+      return WishlistSerializer
