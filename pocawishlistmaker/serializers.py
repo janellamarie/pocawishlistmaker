@@ -4,9 +4,22 @@ from .models import Wishlists, Items, Tags
 class ItemSerializer(serializers.ModelSerializer):
   class Meta:
     model = Items
-    fields = ('id', 'name', 'price', 'created_at', 'updated_at', 'link', 'image_link')
+    fields = '__all__'
 
 class CreateItemSerializer(serializers.ModelSerializer):
   class Meta:
     model = Items
     fields = ('link', 'website')
+
+class WishlistSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Wishlists
+    fields = '__all__'
+
+class CreateWishlistSerializer(serializers.ModelSerializer):
+  # description is an optional field
+  description = serializers.CharField(allow_blank=True, allow_null=True)
+
+  class Meta:
+    model = Wishlists
+    fields = ['name', 'description']

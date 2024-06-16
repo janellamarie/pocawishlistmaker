@@ -4,7 +4,11 @@ import './App'
 import axios from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
-import { Button, Card, CardHeader, FormLabel, FormHelperText, Heading, IconButton, Image, Input,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton } from '@chakra-ui/react';
+import { 
+  Button, Card, CardHeader, FormLabel, FormHelperText, Heading, IconButton, Image, Input,  Modal, ModalBody, 
+  ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, 
+  SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton 
+} from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { Home } from './App';
 
@@ -138,7 +142,7 @@ function Items() {
     )
   }
 
-  function AddItem() {
+  function AddItemButton() {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [url, setURL] = React.useState('')
     const [isLoading , setIsLoading] = React.useState(false)
@@ -244,7 +248,7 @@ function Items() {
     return(
       <>
         {createList(items)}
-        <AddItem />
+        <AddItemButton />
       </>
     )
   } 
