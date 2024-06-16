@@ -47,7 +47,6 @@ function Items() {
         return Error
       }
     })
-    
   }
 
   function ItemOptions({id, link}) {
@@ -179,7 +178,7 @@ function Items() {
             })
             setIsLoading(false)
           }
-        }).done()
+        })
       } catch(error) {
         console.log(error)
         toast({

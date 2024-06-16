@@ -7,11 +7,13 @@ import {
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text,
-  Card, CardHeader, CardBody
+  Card, CardHeader, CardBody,
+  Flex
 } from "@chakra-ui/react"
 
 export function Wishlists() {
   const [wishlists, setWishlists] = React.useState([])
+  const [selectedWishlist, setSelectedWishlist] = React.useState(0)
 
   useEffect(() => {
     const asyncCall = async () => {
@@ -21,6 +23,19 @@ export function Wishlists() {
     asyncCall();
   }, []);
 
+
+  function getAllWishlists() {
+    console.log("fetching items...")
+    axios.get("/api/wishlists/").then(response => {
+      if (response.status >= 200 ) {
+        console.log("[getAllWishlists] successful request")
+        setWishlists(response.data)
+      } else {
+        console.error("eror encountered while making request, response code:", response.status)
+        return Error
+      }
+    })
+  }
   
   function CreateWishlistButton() {
     const {isOpen, onOpen, onClose} = useDisclosure()
@@ -39,7 +54,7 @@ export function Wishlists() {
         }).then(response => {
           if (response.status >= 200) {
             console.log("[handleSubmit] successful request")
-            // TODO: getAllWishlists
+            getAllWishlists()
             toast({
               title: 'Success!',
               description: "Successfully created ", name,
@@ -60,7 +75,7 @@ export function Wishlists() {
             })
             setIsLoading(false)
           }
-        }).done()
+        })
       } catch(error) {
         console.log(error)
         toast({
@@ -79,18 +94,10 @@ export function Wishlists() {
       <>
           <Tooltip label='Create a wishlist' hasArrow placement='top-start'>
             <IconButton
-              onClick={onOpen} 
-              isRound 
-              size='lg' 
+              onClick={onOpen}  
+              size='sm' 
               icon={<AddIcon />} 
               colorScheme='blue'
-              sx={{
-                p:'0',
-                position:'fixed',
-                left:'1%',
-                bottom:'2%',
-                zIndex:'2'
-              }} 
             />
           </Tooltip>
         <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -135,7 +142,6 @@ export function Wishlists() {
   function createList(wishlists) {
     var list = []
     for (let i = 0; i < wishlists.length; i++) {
-      console.log(wishlists[i])
       list.push(
         <Card w='full' mt={0} mb={0}>
           <CardHeader pb='0'>
@@ -157,11 +163,13 @@ export function Wishlists() {
       templateAreas={`"list main"`}
       gridTemplateColumns={'32% 1fr'}
     >
-      <CreateWishlistButton />
-      <GridItem area={'list'} backgroundColor='blue.200' p={1}>
+      <GridItem area={'list'} backgroundColor='blue.200' p={2}>
         <Box>
-          <Heading>Wishlists</Heading>
-          <InputGroup mt={1} mb={1}>
+          <Flex justifyContent='space-between' alignItems='center'>
+            <Heading>Wishlists</Heading>
+            <CreateWishlistButton />
+          </Flex>
+          <InputGroup mt={1} mb={2}>
             <Input placeholder='Search' variant='filled' />
             <InputRightElement>
               <IconButton icon={<SearchIcon />} size='sm'/>
