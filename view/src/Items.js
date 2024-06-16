@@ -9,7 +9,8 @@ import {
   ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, 
   SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton, 
   CardFooter,
-  Select
+  Select,
+  Badge
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 import { Home } from './App';
@@ -96,23 +97,34 @@ function Items() {
           aria-label='Options'
           icon={<EditIcon />}
           variant='ghost'
-          sx={{position:'relative', left:'48%'}}
+          sx={{position:'relative', left:'30%'}}
         />
-      <MenuList>
+        <MenuList>
           <MenuItem icon={<DeleteIcon />} onClick={handleItemDelete}>
             Delete
           </MenuItem>
           <MenuItem icon={<ExternalLinkIcon />} as='a' href={link} target='_blank'>
             Go to original page
           </MenuItem>
-      </MenuList>
+        </MenuList>
       </Menu>
     )
   }
 
-  function ItemHeader({id, link, image_link, name}) {
+  function ItemHeader({id, link, image_link, name, website}) {
     return (
       <>
+        <Badge 
+          as='a' 
+          href={link} 
+          target='_blank' 
+          sx={{
+            position:'relative',
+            right:'25%'
+          }}
+        >
+          {website}
+        </Badge>
         <ItemOptions id={id} link={link} />
         <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
         <Heading size='s'>
@@ -207,12 +219,11 @@ function Items() {
     return (
       <Card variant='outline'>
         <CardHeader align='center' pb={0} pt={1}>
-          <ItemHeader id={id} link={link} image_link={image_link} name={name} />
+          <ItemHeader id={id} link={link} image_link={image_link} name={name} website={website}s/>
         </CardHeader>  
         <CardBody align='center' pb={5} pt={2}>
           <Text fontSize='l'>
-            {website === "mercari us" ? "$" : "¥" }
-            {price.toFixed(2)}
+            ${price.toFixed(2)}
           </Text>
         </CardBody>
         <CardFooter pt={0}>

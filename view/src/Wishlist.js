@@ -8,7 +8,8 @@ import {
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
   Flex, SimpleGrid,
-  Image
+  Image,
+  Badge
 } from "@chakra-ui/react"
 
 export function Wishlists() {
@@ -44,7 +45,7 @@ export function Wishlists() {
     const [isLoading , setIsLoading] = React.useState(false)
     const toast = useToast()
   
-    const handleSubmit = async event => {
+    const handleSubmitCreateWishlist = async event => {
       event.preventDefault()
       setIsLoading(true)
       try {
@@ -53,7 +54,7 @@ export function Wishlists() {
           description: description
         }).then(response => {
           if (response.status >= 200) {
-            console.log("[handleSubmit] successful request")
+            console.log("[handleSubmitCreateWishlist] successful request")
             getAllWishlists()
             toast({
               title: 'Success!',
@@ -64,7 +65,8 @@ export function Wishlists() {
               position: 'top'
             })
           } else {
-            console.error("[handleSubmit] error encountered")
+            console.error("[handleSubmitCreateWishlist] error encountered")
+            setIsLoading(false)
             toast({
               title: 'Error!',
               description: "An error occured whie trying to create the wishlist.",
@@ -73,11 +75,11 @@ export function Wishlists() {
               isClosable: true,
               position: 'top'
             })
-            setIsLoading(false)
           }
         })
       } catch(error) {
-        console.log(error)
+        console.error("[handleSubmitCreateWishlist] error encountered")
+        setIsLoading(false)
         toast({
           title: 'Error!',
           description: "An error occured whie trying to create the wishlist.",
@@ -86,7 +88,6 @@ export function Wishlists() {
           isClosable: true,
           position: 'top'
         })
-        setIsLoading(false)
       }
     };
     
@@ -127,7 +128,7 @@ export function Wishlists() {
               <Button 
                 colorScheme='blue' 
                 type='submit' 
-                onClick={handleSubmit} 
+                onClick={handleSubmitCreateWishlist} 
                 isLoading={isLoading}
                 loadingText='Submitting'>
                   Submit
@@ -204,7 +205,6 @@ export function Wishlists() {
   function createItemList(items) {
     var list = []
     for (let i = 0; i < items.length; i++) {
-      // console.log(items[i])
       list.push(
         <Card variant='outline'>
           <CardHeader align='center' pb={0} pt={1}>
