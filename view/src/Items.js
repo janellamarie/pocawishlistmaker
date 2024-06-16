@@ -183,7 +183,7 @@ function Items() {
             setIsAddToWishlistLoading(false)
             toast({
               title: 'Success!',
-              description: "Successfully add item to wishlist.",
+              description: "Successfully added item to wishlist.",
               status: 'success',
               duration: 4000,
               isClosable: true,
