@@ -29,8 +29,7 @@ SECRET_KEY = 'django-insecure-e-ptp_rq8ufqigfx@q24jgn%pm1c4jc%1mnwggf1616=8(%9be
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -42,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'corsheaders',
     'rest_framework',
 ]
