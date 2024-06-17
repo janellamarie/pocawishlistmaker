@@ -183,7 +183,6 @@ export function Wishlists() {
         <Tooltip label='Delete this wishlist' hasArrow>
           <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} colorScheme='red'/>
         </Tooltip>
-          <IconButton icon={<AddIcon />} colorScheme='blue' />
         <AlertDialog
           isOpen={isConfirmWishlistDeleteAlertDialogOpen}
           leastDestructiveRef={cancelRef}
