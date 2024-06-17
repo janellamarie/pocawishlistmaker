@@ -1,5 +1,5 @@
 import './App.css';
-import { Button, Grid, GridItem, Heading} from '@chakra-ui/react'
+import { Button, Grid, GridItem, Heading, SimpleGrid} from '@chakra-ui/react'
 import { Link, Routes, Route } from 'react-router-dom';
 import Items from './Items';
 import { Wishlists } from './Wishlist';
@@ -10,6 +10,10 @@ function Navigation() {
       templateColumns='repeat(1, 2)' 
       data-testid='navigation-bar'
       backgroundColor='gray.100'
+      gap={6}
+      p={4}
+      boxShadow='0 2px 3px -2px gray'
+      zIndex='2'
     >
       <GridItem w='100%' colSpan={1}>
         <Heading size='lg'>
@@ -38,22 +42,12 @@ function Navigation() {
 
 export function Home({body}) {
   return(
-    <Grid 
-      templateAreas={`"header"
-        "main"
-        "footer"`}
-      gridTemplateRows={'50px 90% 50px'}
-      gridTemplateColumns={'1fr'}
-      gap='1'
-      p='1'
-    >
-      <GridItem area={'header'}>
-        <Navigation />
-      </GridItem>
-      <GridItem area={'main'}>
-        {body}
-      </GridItem>
-    </Grid>
+    <SimpleGrid columns={1}>
+      <Navigation />
+      {body}
+      <>
+      </>
+    </SimpleGrid>
   )
 }
 
@@ -63,8 +57,8 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/items" element={<Items />} />
-        <Route path="/wishlists" element={<Wishlists />} />
+        <Route path="/items" element={<Home body={<Items />}/>} />
+        <Route path="/wishlists" element={<Home body={<Wishlists />}/>} />
       </Routes>
     </>
   );

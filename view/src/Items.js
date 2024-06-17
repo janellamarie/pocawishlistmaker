@@ -13,7 +13,6 @@ import {
   Badge
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
-import { Home } from './App';
 
 function parseWebsite(url) {
   const split = url.split('.')
@@ -219,7 +218,7 @@ function Items() {
     return (
       <Card variant='outline'>
         <CardHeader align='center' pb={0} pt={1}>
-          <ItemHeader id={id} link={link} image_link={image_link} name={name} website={website}s/>
+          <ItemHeader id={id} link={link} image_link={image_link} name={name} website={website}/>
         </CardHeader>  
         <CardBody align='center' pb={5} pt={2}>
           <Text fontSize='l'>
@@ -397,7 +396,7 @@ function Items() {
   function ItemsBody({items}) {
     return(
       <>
-        <SimpleGrid spacing={4} columns={5}>
+        <SimpleGrid spacing={4} columns={5} p={2}>
           {createItemList(items)}
         </SimpleGrid>
         
@@ -407,10 +406,7 @@ function Items() {
   } 
 
   return(
-    <Home body={
-        <ItemsBody items={items} />
-      } 
-    />
+    <ItemsBody items={items} />
   )
 }
 

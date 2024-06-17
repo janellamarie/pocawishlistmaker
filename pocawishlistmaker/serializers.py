@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Wishlists, Items, Tags
+from django.utils import timezone
 
 class ItemSerializer(serializers.ModelSerializer):
   class Meta:
@@ -20,16 +21,28 @@ class WishlistSerializer(serializers.ModelSerializer):
     fields = '__all__'
     
 class UpdateWishlistSerializer(serializers.ModelSerializer):
+  updated_at = serializers.DateTimeField(required=False)
+
   class Meta:
     model = Wishlists
-    fields = ['items']
+    fields = ['items', 'updated_at']
 
   def update(self, instance, validated_data):
-    print("[UpdateWishlistSerializer.update]", validated_data.get('items')[0])
+    print("[UpdateWishlistSerializer.update] validated_data", validated_data)
     try:
-      instance.items.add(validated_data.get('items')[0])
-      instance.save()
-      return instance
+      if validated_data.get('updated_at') is None:
+        print("[UpdateWishlistSerializer.update] - add item")
+        instance.items.add(validated_data.get('items')[0])
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance
+      else:
+        print("[UpdateWishlistSerializer.update] - delete")
+        instance.items.remove(validated_data.get('items')[0])
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance
+        
     except Exception as e:
       raise e
 

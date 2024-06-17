@@ -2,14 +2,14 @@ import * as React from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-import { AddIcon, EditIcon, DeleteIcon, ExternalLinkIcon, SearchIcon } from "@chakra-ui/icons"
+import { AddIcon, EditIcon, DeleteIcon, SearchIcon, Icon } from "@chakra-ui/icons"
 import { 
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
   Flex, SimpleGrid, Image, Menu, MenuList, MenuButton, MenuItem,
   Link,
-  Container
+  Badge,
 } from "@chakra-ui/react"
 
 export function Wishlists() {
@@ -223,69 +223,124 @@ export function Wishlists() {
     return list
   }
 
-  function ItemOptions({id, link}) {
+  function SmallItemHeader({id, link, image_link, name, website}) {
     const toast = useToast()
-    const handleItemDelete = async event => {
-      console.log('deleting', id, '...')
-      let url = '/api/items/' + id
-      axios.delete(url).then(response => {
-        if (response.status >= 200) {
-          console.log("successful request")
-          // getAllItems()
-          toast({
-            title: 'Success!',
-            description: "Successfully deleted item from database.",
-            status: 'success',
-            duration: 4000,
+
+    const handleSmallItemDeleteOnClick = event => {
+      console.log("[handleSmallItemDeleteOnClick] event.target.id", event.target.id, 
+                  "\n[handleSmallItemDeleteOnClick] selectedWishlist", wishlists[selectedWishlist].id)
+      var url = '/api/wishlists/' + wishlists[selectedWishlist].id + '/'
+      try {
+        axios.patch(url, {
+          items: [id],
+          updated_at: new Date()
+        }).then(response => {
+          if (response.statusText === 'OK') {
+            console.error("[handleSmallItemDeleteOnClick] error encountered")
+            getAllWishlists()
+            toast({
+              title: 'Success!',
+              description: "Successfully removed item from wishlist.",
+              status: 'success',
+              duration: 4000,
+              isClosable: true,
+              position: 'top'
+            })
+          } else {
+            console.error("[handleSmallItemDeleteOnClick] error encountered")
+            toast({
+              title: 'Error!',
+              description: "An error occured whie trying to remove this item from the wishlist.",
+              status: 'error',
+              duration: 4000,
+                isClosable: true,
+                position: 'top'
+            })
+          }
+        })
+      } catch(error) {
+        console.error("[handleSmallItemDeleteOnClick] error encountered")
+        toast({
+          title: 'Error!',
+          description: "An error occured whie trying to remove this item from the wishlist.",
+          status: 'error',
+          duration: 4000,
             isClosable: true,
             position: 'top'
-          })
-        } else {
-          console.error("error encountered")
-          toast({
-            title: 'Error!',
-            description: "Unable to delete item from database.",
-            status: 'error',
-            duration: 4000,
-            isClosable: true,
-            position: 'top'
-          })
-        }
-      })
-    };
+        })
+      }
+    }
+
+    return (
+      <>
+        <Badge 
+          as='a' 
+          href={link} 
+          target='_blank' 
+          mb={2}
+          mt={1}
+          sx={{
+            position:'relative',
+            right:'26%'
+          }}
+        >
+          {website}
+        </Badge>
+        <IconButton 
+          icon={<DeleteIcon />} 
+          size='xs'
+          variant='ghost' 
+          sx={{position: 'relative',
+            left:'26%'
+          }}
+          id={id}
+          onClick={handleSmallItemDeleteOnClick}
+        />
+        <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
+        <Heading size='s'>
+          <span className='id' style={{display:'none'}}>{id}</span>
+          <Tooltip label={name} hasArrow>
+            <Text noOfLines={2} pb={1}>
+              {name}
+            </Text>
+          </Tooltip>
+        </Heading>
+      </>
+    )
   }
 
+  function SmallItem({id, name, link, website, price, image_link}) {
+    return (
+      <Card variant='outline'>
+          <CardHeader align='center' pb={0} pt={1}>
+            <SmallItemHeader id={id} link={link} image_link={image_link} name={name} website={website} />
+          </CardHeader>  
+          <CardBody align='center' pb={5} pt={2}>
+            <Text fontSize='md'>
+              ${price.toFixed(2)}
+            </Text>
+          </CardBody>
+        </Card>
+    )
+  }
+  
   function createItemList(items) {
     var list = []
     for (let i = 0; i < items.length; i++) {
       list.push(
-        <Card variant='outline'>
-          <CardHeader align='center' pb={0} pt={1}>
-            <ItemOptions 
-              id={items[i].id}
-              link={items[i].link}
-            />
-              <Image src={items[i].image_link} boxSize='150px' mb={2} objectFit='cover' /> 
-              <Heading size='s'>
-                <span className='id' style={{display:'none'}}>{items[i].id}</span>
-                <Tooltip label={items[i].name} hasArrow>
-                  <Text noOfLines={2} pb={1}>
-                    {items[i].name}
-                  </Text>
-                </Tooltip>
-              </Heading>
-          </CardHeader>  
-          <CardBody align='center' pb={5} pt={2}>
-            <Text fontSize='l'>
-              ${items[i].price.toFixed(2)}
-            </Text>
-          </CardBody>
-        </Card>
+        <SmallItem 
+          id={items[i].id} 
+          name={items[i].name} 
+          link={items[i].link} 
+          website={items[i].website} 
+          price={items[i].price} 
+          image_link={items[i].image_link}
+        />
       )
     }
 
     return (
-      <SimpleGrid spacing={4} columns={5} pt={2}>
+      <SimpleGrid spacing={2} columns={5} pt={2}>
         {list}
       </SimpleGrid>
     )
@@ -295,14 +350,10 @@ export function Wishlists() {
     return (
       <Box 
         w='full' 
-        textAlign='left' 
-        backgroundColor='gray.100' 
-        p={2} 
-        // borderBottomColor='black' 
-        // borderBottom='1px'
-      >
+        textAlign='left'
+        p={2}>
         <Flex justifyContent='space-between'>
-          <Heading>
+          <Heading size='lg'>
             {wishlist.name}
           </Heading>
           <WishlistOptions id={wishlist.id} />
@@ -311,7 +362,7 @@ export function Wishlists() {
         {wishlist.description !== '' ? 
           <>
             <Divider p={1} />
-            <Heading size='md' pb={1} pt={2}>Description</Heading>
+            <Heading size='s' pb={1} pt={2}>Description</Heading>
             <Text textAlign='left'>{wishlist.description}</Text>
           </>
           : <Box></Box>}
@@ -321,15 +372,12 @@ export function Wishlists() {
   }
 
   return (
-    <Grid 
-      templateAreas={`"list main"`}
-      gridTemplateRows={'100%'}
-      gridTemplateColumns={'25% 74%'}
-    >
-      <GridItem area={'list'} bg='blue.200' p={2}>
+    <Grid templateAreas={`"list content"`}
+          gridTemplateColumns={'23%'}>
+      <GridItem area={'list'} bg='blue.200' p={4}>
         <Box>
           <Flex justifyContent='space-between' alignItems='center'>
-            <Heading>Wishlists</Heading>
+            <Heading size='lg'>Wishlists</Heading>
             <CreateWishlistButton />
           </Flex>
           <InputGroup mt={1} mb={2}>
@@ -342,15 +390,16 @@ export function Wishlists() {
         <VStack>
           {createWishlistList(wishlists)}
         </VStack>
-        
       </GridItem>
-      <GridItem area={'main'} pl={2} pt={2}>
-        {wishlists.length !== 0 ? 
-          <WishlistDetails wishlist={wishlists[selectedWishlist]} /> : <Box></Box>
-        }
-        {wishlists.length !== 0 ? 
-          createItemList(wishlists[selectedWishlist]['items']) : <Box></Box>
-        }
+      <GridItem area={'content'}>
+        <Box p={2}>
+          {wishlists.length !== 0 ? 
+            <WishlistDetails wishlist={wishlists[selectedWishlist]} /> : <Box></Box>
+          }
+          {wishlists.length !== 0 ? 
+            createItemList(wishlists[selectedWishlist]['items']) : <Box></Box>
+          }
+        </Box>
       </GridItem>
     </Grid>
   )
