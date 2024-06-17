@@ -194,7 +194,7 @@ export function Wishlists() {
               </AlertDialogHeader>
         
               <AlertDialogBody>
-                Are you sure? You can't undo this action afterwards.
+                Are you sure you want to delete this wishlist?
               </AlertDialogBody>
         
               <AlertDialogFooter>
@@ -249,6 +249,10 @@ export function Wishlists() {
 
   function SmallItemHeader({id, link, image_link, name, website}) {
     const toast = useToast()
+    const {isOpen: isConfirmSmallItemDeleteAlertDialogOpen, 
+           onOpen: onConfirmSmallItemDeleteAlertDialogOpen, 
+           onClose: onConfirmSmallItemDeleteAlertDialogClose } = useDisclosure()
+    const cancelRef = React.useRef()
 
     const handleSmallItemDeleteOnClick = event => {
       console.log("[handleSmallItemDeleteOnClick] event.target.id", event.target.id, 
@@ -318,9 +322,34 @@ export function Wishlists() {
             left:'26%'
           }}
           id={id}
-          onClick={handleSmallItemDeleteOnClick}
+          onClick={onConfirmSmallItemDeleteAlertDialogOpen}
           colorScheme='red'
         />
+        <AlertDialog
+          isOpen={isConfirmSmallItemDeleteAlertDialogOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onConfirmSmallItemDeleteAlertDialogClose}>
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                Delete item from wishlist
+              </AlertDialogHeader>
+        
+              <AlertDialogBody>
+                Are you sure you want to delete this item?
+              </AlertDialogBody>
+        
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onConfirmSmallItemDeleteAlertDialogClose}>
+                  Cancel
+                </Button>
+                <Button colorScheme='red' onClick={handleSmallItemDeleteOnClick} ml={3}>
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
         <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
         <Heading size='s'>
           <span className='id' style={{display:'none'}}>{id}</span>
