@@ -10,7 +10,8 @@ import {
   SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton, 
   CardFooter,
   Select,
-  Badge
+  Badge,
+  Box
 } from '@chakra-ui/react';
 import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
 
@@ -396,9 +397,13 @@ function Items() {
   function ItemsBody({items}) {
     return(
       <>
-        <SimpleGrid spacing={4} columns={5} p={2}>
-          {createItemList(items)}
-        </SimpleGrid>
+        <Box p={2}>
+          <Heading>Items</Heading>  
+          <SimpleGrid spacing={4} columns={5} p={2}>
+            {createItemList(items)}
+          </SimpleGrid>
+        </Box>
+        
         
         <AddItemButton />
       </>

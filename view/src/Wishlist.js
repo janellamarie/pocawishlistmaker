@@ -181,8 +181,9 @@ export function Wishlists() {
     return(
       <>
         <Tooltip label='Delete this wishlist' hasArrow>
-          <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} />
+          <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} colorScheme='red'/>
         </Tooltip>
+          <IconButton icon={<AddIcon />} colorScheme='blue' />
         <AlertDialog
           isOpen={isConfirmWishlistDeleteAlertDialogOpen}
           leastDestructiveRef={cancelRef}
@@ -319,6 +320,7 @@ export function Wishlists() {
           }}
           id={id}
           onClick={handleSmallItemDeleteOnClick}
+          colorScheme='red'
         />
         <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
         <Heading size='s'>
@@ -364,7 +366,7 @@ export function Wishlists() {
     }
 
     return (
-      <SimpleGrid spacing={2} columns={5} pt={2}>
+      <SimpleGrid spacing={2} columns={5} pt={2} pl={2}>
         {list}
       </SimpleGrid>
     )
