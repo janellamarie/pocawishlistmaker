@@ -2,14 +2,14 @@ import * as React from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-import { AddIcon, EditIcon, DeleteIcon, SearchIcon, Icon } from "@chakra-ui/icons"
+import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons"
 import { 
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
   Flex, SimpleGrid, Image, Menu, MenuList, MenuButton, MenuItem,
-  Link,
-  Badge,
+  Link, Badge, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, 
+  AlertDialogFooter
 } from "@chakra-ui/react"
 
 export function Wishlists() {
@@ -24,6 +24,24 @@ export function Wishlists() {
     }
     asyncCall();
   }, []);
+
+
+  function ConfirmWishlistDeleteAlertDialog() {
+    const {isOpen: isConfirmWishlistDeleteAlertDialogOpen, 
+           onOpen: onConfirmWishlistDeleteAlertDialogOpen, 
+           onClose: onConfirmWishlistDeleteAlertDialogClose } = useDisclosure()
+    const cancelRef = React.useRef()
+  
+    return (
+      <>
+        <Button colorScheme='red' onClick={onConfirmWishlistDeleteAlertDialogOpen}>
+          Delete Customer
+        </Button>
+  
+        
+      </>
+    )
+  }
 
   function getAllWishlists() {
     console.log("fetching items...")
@@ -141,14 +159,20 @@ export function Wishlists() {
   }
 
   function WishlistOptions({id}) {
+    const {isOpen: isConfirmWishlistDeleteAlertDialogOpen, 
+           onOpen: onConfirmWishlistDeleteAlertDialogOpen, 
+           onClose: onConfirmWishlistDeleteAlertDialogClose } = useDisclosure()
+    const cancelRef = React.useRef()
+    
     const toast = useToast()
     const handleWishlistDelete = async event => {
-      console.log('deleting', id, '...')
+      console.log('[handleWishlistDelete] deleting', id, '...')
       let url = '/api/wishlists/' + id + '/'
       axios.delete(url).then(response => {
         if (response.status >= 200) {
-          console.log("successful request")
+          console.log("[handleWishlistDelete] successful request")
           getAllWishlists()
+          setSelectedWishlist(0)
           toast({
             title: 'Success!',
             description: "Successfully deleted item from database.",
@@ -172,20 +196,35 @@ export function Wishlists() {
     };
 
     return(
-      <Menu isLazy>
-        <MenuButton
-          as={IconButton}
-          aria-label='Edit wishlist'
-          icon={<EditIcon />}
-          size='md'
-          variant='solid'
-        />
-        <MenuList>
-          <MenuItem icon={<DeleteIcon />} onClick={handleWishlistDelete}>
-            Delete
-          </MenuItem>
-        </MenuList>
-      </Menu>
+      <>
+        <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} />
+        <AlertDialog
+          isOpen={isConfirmWishlistDeleteAlertDialogOpen}
+          leastDestructiveRef={cancelRef}
+          onClose={onConfirmWishlistDeleteAlertDialogClose}>
+          <AlertDialogOverlay>
+            <AlertDialogContent>
+              <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                Delete Wishlist
+              </AlertDialogHeader>
+        
+              <AlertDialogBody>
+                Are you sure? You can't undo this action afterwards.
+              </AlertDialogBody>
+        
+              <AlertDialogFooter>
+                <Button ref={cancelRef} onClick={onConfirmWishlistDeleteAlertDialogClose}>
+                  Cancel
+                </Button>
+                <Button colorScheme='red' onClick={handleWishlistDelete} ml={3}>
+                  Delete
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialogOverlay>
+        </AlertDialog>
+      </>
+      
     )
   }
 
