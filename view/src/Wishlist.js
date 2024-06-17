@@ -26,23 +26,6 @@ export function Wishlists() {
   }, []);
 
 
-  function ConfirmWishlistDeleteAlertDialog() {
-    const {isOpen: isConfirmWishlistDeleteAlertDialogOpen, 
-           onOpen: onConfirmWishlistDeleteAlertDialogOpen, 
-           onClose: onConfirmWishlistDeleteAlertDialogClose } = useDisclosure()
-    const cancelRef = React.useRef()
-  
-    return (
-      <>
-        <Button colorScheme='red' onClick={onConfirmWishlistDeleteAlertDialogOpen}>
-          Delete Customer
-        </Button>
-  
-        
-      </>
-    )
-  }
-
   function getAllWishlists() {
     console.log("fetching items...")
     axios.get("/api/wishlists/").then(response => {
@@ -172,7 +155,7 @@ export function Wishlists() {
         if (response.status >= 200) {
           console.log("[handleWishlistDelete] successful request")
           getAllWishlists()
-          setSelectedWishlist(0)
+          selectedWishlist > 1 ? setSelectedWishlist(selectedWishlist-1) : setSelectedWishlist(0)
           toast({
             title: 'Success!',
             description: "Successfully deleted item from database.",
@@ -197,7 +180,9 @@ export function Wishlists() {
 
     return(
       <>
-        <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} />
+        <Tooltip label='Delete this wishlist' hasArrow>
+          <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} />
+        </Tooltip>
         <AlertDialog
           isOpen={isConfirmWishlistDeleteAlertDialogOpen}
           leastDestructiveRef={cancelRef}
@@ -400,11 +385,11 @@ export function Wishlists() {
 
         {wishlist.description !== '' ? 
           <>
-            <Divider p={1} />
             <Heading size='s' pb={1} pt={2}>Description</Heading>
-            <Text textAlign='left'>{wishlist.description}</Text>
+            <Text textAlign='left' fontSize='sm'>{wishlist.description}</Text>
+            <Divider p={1} />
           </>
-          : <Box></Box>}
+          : <Box><Divider p={1} /></Box>}
         
       </Box>
     )
@@ -413,7 +398,7 @@ export function Wishlists() {
   return (
     <Grid templateAreas={`"list content"`}
           gridTemplateColumns={'23%'}>
-      <GridItem area={'list'} bg='blue.200' p={4}>
+      <GridItem area={'list'}  p={4} minHeight='90vh' borderRight='1px' borderRightColor='gray.300'>
         <Box>
           <Flex justifyContent='space-between' alignItems='center'>
             <Heading size='lg'>Wishlists</Heading>
