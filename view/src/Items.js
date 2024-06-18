@@ -5,15 +5,41 @@ import axios from 'axios';
 import * as React from 'react';
 import { useEffect } from 'react';
 import { 
-  Button, Card, CardHeader, FormLabel, FormHelperText, Heading, IconButton, Image, Input,  Modal, ModalBody, 
-  ModalCloseButton, ModalContent, ModalHeader, ModalFooter, ModalOverlay, useDisclosure, FormControl, 
-  SimpleGrid, useToast, CardBody, Text, Tooltip, Menu, MenuList, MenuItem, MenuButton, 
+  Button, 
+  Card, 
+  CardHeader, 
+  FormLabel, 
+  FormHelperText, 
+  Heading, IconButton, 
+  Image, 
+  Input,
+  Flex, 
+  Modal, 
+  ModalBody, 
+  ModalCloseButton, 
+  ModalContent, 
+  ModalHeader, 
+  ModalFooter, 
+  ModalOverlay, 
+  useDisclosure, 
+  FormControl, 
+  SimpleGrid, 
+  useToast, 
+  CardBody, 
+  Text, 
+  Tooltip,
+  Menu, 
+  MenuList, 
+  MenuItem, 
+  MenuButton, 
   CardFooter,
   Select,
   Badge,
-  Box
+  Box,
+  InputGroup,
+  InputRightElement
 } from '@chakra-ui/react';
-import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon } from '@chakra-ui/icons'
+import { AddIcon, DeleteIcon, EditIcon, ExternalLinkIcon, SearchIcon } from '@chakra-ui/icons'
 
 function parseWebsite(url) {
   const split = url.split('.')
@@ -47,13 +73,13 @@ function Items() {
   }, []);
 
   function getAllItems() {
-    console.log("fetching items...")
+    console.log("[Items.getAllItems] fetching items...")
     axios.get("/api/items/").then(response => {
       if (response.status >= 200 ) {
-        console.log("[getAllItems] successful request")
+        console.log("[Items.getAllItems] successful request")
         setItems(response.data)
       } else {
-        console.error("eror encountered while making request, response code:", response.status)
+        console.error("[Items.getAllItems] error encountered while making request, response code:", response.status)
         return Error
       }
     })
@@ -62,11 +88,11 @@ function Items() {
   function ItemOptions({id, link}) {
     const toast = useToast()
     const handleItemDelete = async event => {
-      console.log('deleting', id, '...')
+      console.log('[ItemOptions handleItemDelete]', id, '...')
       let url = '/api/items/' + id
       axios.delete(url).then(response => {
         if (response.status >= 200) {
-          console.log("successful request")
+          console.log("[ItemOptions handleItemDelete] successful request")
           getAllItems()
           toast({
             title: 'Success!',
@@ -77,7 +103,7 @@ function Items() {
             position: 'top'
           })
         } else {
-          console.error("error encountered")
+          console.error("[ItemOptions handleItemDelete] error encountered")
           toast({
             title: 'Error!',
             description: "Unable to delete item from database.",
@@ -89,9 +115,10 @@ function Items() {
         }
       })
     };
-  
+    
     return(
       <Menu isLazy>
+        {/* TODO: replace edit icon with delete and remove "Go to original page" */}
         <MenuButton
           as={IconButton}
           aria-label='Options'
@@ -114,17 +141,20 @@ function Items() {
   function ItemHeader({id, link, image_link, name, website}) {
     return (
       <>
-        <Badge 
-          as='a' 
-          href={link} 
-          target='_blank' 
-          sx={{
-            position:'relative',
-            right:'25%'
-          }}
-        >
-          {website}
-        </Badge>
+        <Tooltip label={'Go to original page'} hasArrow>
+          {/* TODO: update this to say Mercari JP or Mercari US */}
+          <Badge 
+            as='a' 
+            href={link} 
+            target='_blank' 
+            sx={{
+              position:'relative',
+              right:'25%'
+            }}
+          >
+            {website}
+          </Badge>
+        </Tooltip>
         <ItemOptions id={id} link={link} />
         <Image src={image_link} boxSize='150px' mb={2} objectFit='cover' /> 
         <Heading size='s'>
@@ -185,7 +215,7 @@ function Items() {
               title: 'Success!',
               description: "Successfully added item to wishlist.",
               status: 'success',
-              duration: 4000,
+              duration: 2000,
               isClosable: true,
               position: 'top'
             })
@@ -196,7 +226,7 @@ function Items() {
               title: 'Error!',
               description: "An error occured whie trying to add the item to the database.",
               status: 'error',
-              duration: 4000,
+              duration: 2000,
                 isClosable: true,
                 position: 'top'
             })
@@ -227,6 +257,7 @@ function Items() {
           </Text>
         </CardBody>
         <CardFooter pt={0}>
+          {/* TODO: replace CardFooter with Tags */}
           <Button 
             leftIcon={<AddIcon />} 
             w='full' 
@@ -395,10 +426,33 @@ function Items() {
   }
   
   function ItemsBody({items}) {
+    const [toSearch, setToSearch] = React.useState('')
+    const handleAllItemsSearchOnClick = event => {
+      console.log("[ItemsBody.handleAllItemsSearch] fetching items...")
+      axios.get("/api/items/?search=" + toSearch).then(response => {
+        if (response.statusText === 'OK' ) {
+          console.log("[ItemsBody.handleAllItemsSearch] successful request", response.data)
+          setItems(response.data)
+        } else {
+          console.error("[ItemsBody.handleAllItemsSearch] error encountered while making request, response code:", response.status)
+          return Error
+        }
+      })
+    }
+    
     return(
       <>
         <Box p={2}>
-          <Heading>Items</Heading>  
+          <Flex justifyContent='space-between'>
+            <Heading>Items</Heading>
+            <InputGroup mt={1} mb={2} width='20%'>
+              <Input placeholder='Search all items' variant='filled' onChange={event => setToSearch(event.currentTarget.value)} />
+              <InputRightElement>
+                <IconButton icon={<SearchIcon />} size='sm' onClick={handleAllItemsSearchOnClick} />
+              </InputRightElement>
+            </InputGroup>
+          </Flex>
+          
           <SimpleGrid spacing={4} columns={5} p={2}>
             {createItemList(items)}
           </SimpleGrid>

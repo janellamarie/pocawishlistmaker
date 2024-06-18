@@ -2,14 +2,13 @@ import * as React from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons"
+import { AddIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons"
 import { 
   Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
   Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
   ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
-  Flex, SimpleGrid, Image, Menu, MenuList, MenuButton, MenuItem,
-  Link, Badge, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, 
-  AlertDialogFooter
+  Flex, SimpleGrid, Image, Link, Badge, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, 
+  AlertDialogFooter, AlertDialogCloseButton
 } from "@chakra-ui/react"
 
 export function Wishlists() {
@@ -27,7 +26,7 @@ export function Wishlists() {
 
 
   function getAllWishlists() {
-    console.log("fetching items...")
+    console.log("fetching wishlists...")
     axios.get("/api/wishlists/").then(response => {
       if (response.status >= 200 ) {
         console.log("[getAllWishlists] successful request")
@@ -57,6 +56,7 @@ export function Wishlists() {
           if (response.status >= 200) {
             console.log("[handleSubmitCreateWishlist] successful request")
             getAllWishlists()
+            // setSelectedWishlist(wishlists.at(-1))
             toast({
               title: 'Success!',
               description: "Successfully created ", name,
@@ -180,6 +180,7 @@ export function Wishlists() {
 
     return(
       <>
+        {/* TODO: add item to wishlist  */}
         <Tooltip label='Delete this wishlist' hasArrow>
           <IconButton icon={<DeleteIcon />} onClick={onConfirmWishlistDeleteAlertDialogOpen} colorScheme='red'/>
         </Tooltip>
@@ -190,9 +191,9 @@ export function Wishlists() {
           <AlertDialogOverlay>
             <AlertDialogContent>
               <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                Delete Wishlist
+                Delete <Text as='span' color='blue.600'>{wishlists[selectedWishlist].name} </Text>wishlist
               </AlertDialogHeader>
-        
+              <AlertDialogCloseButton />
               <AlertDialogBody>
                 Are you sure you want to delete this wishlist?
               </AlertDialogBody>
@@ -332,11 +333,11 @@ export function Wishlists() {
           <AlertDialogOverlay>
             <AlertDialogContent>
               <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                Delete item from wishlist
+                Remove this item from wishlist
               </AlertDialogHeader>
         
               <AlertDialogBody>
-                Are you sure you want to delete this item?
+                Are you sure you want to remove this item from <Text as='span'>{wishlists[selectedWishlist].name} wishlist?</Text>
               </AlertDialogBody>
         
               <AlertDialogFooter>
@@ -344,7 +345,7 @@ export function Wishlists() {
                   Cancel
                 </Button>
                 <Button colorScheme='red' onClick={handleSmallItemDeleteOnClick} ml={3}>
-                  Delete
+                  Remove
                 </Button>
               </AlertDialogFooter>
             </AlertDialogContent>

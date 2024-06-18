@@ -27,6 +27,8 @@ class UpdateWishlistSerializer(serializers.ModelSerializer):
     model = Wishlists
     fields = ['items', 'updated_at']
 
+  # TODO: find a better way to make a request from the front-end to the back-end for deleting items from
+  # a wishlist
   def update(self, instance, validated_data):
     print("[UpdateWishlistSerializer.update] validated_data", validated_data)
     try:
