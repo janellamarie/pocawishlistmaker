@@ -55,3 +55,13 @@ class CreateWishlistSerializer(serializers.ModelSerializer):
   class Meta:
     model = Wishlists
     fields = ['name', 'description']
+
+class TagSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Tags
+    fields = '__all__'
+
+class CreateTagSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Tags
+    fields = ['name']

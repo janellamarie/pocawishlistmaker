@@ -23,6 +23,7 @@ from . import home
 router = routers.DefaultRouter()
 router.register(r'items', views.ItemView, 'item')
 router.register(r'wishlists', views.WishlistView, 'wishlist')
+router.register(r'tags', views.TagView, 'tag')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -2,6 +2,7 @@ import './App.css';
 import { Button, Grid, GridItem, Heading, SimpleGrid} from '@chakra-ui/react'
 import { Link, Routes, Route } from 'react-router-dom';
 import Items from './Items';
+import Tags from './Tags';
 import { Wishlists } from './Wishlist';
 
 function Navigation() {
@@ -22,17 +23,24 @@ function Navigation() {
           </Link>
         </Heading>
       </GridItem>
-      <GridItem colStart={3} colEnd={4}>
+      <GridItem colStart={2} colEnd={3}>
         <Button w='95%' variant='link' h='full'>
           <Link to="/items">
             Items
           </Link>
         </Button>
       </GridItem>
-      <GridItem colStart={4} colEnd={5}>
+      <GridItem colStart={3} colEnd={4}>
         <Button w='95%' variant='link' h='full'>
           <Link to="/wishlists">
             Wishlists
+          </Link>
+        </Button>
+      </GridItem>
+      <GridItem colStart={4} colEnd={5}>
+        <Button w='95%' variant='link' h='full'>
+          <Link to="/tags">
+            Tags
           </Link>
         </Button>
       </GridItem>
@@ -59,6 +67,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/items" element={<Home body={<Items />}/>} />
         <Route path="/wishlists" element={<Home body={<Wishlists />}/>} />
+        <Route path="/tags" element={<Home body={<Tags />}/>} />
       </Routes>
     </>
   );

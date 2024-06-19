@@ -32,7 +32,7 @@ export function Wishlists() {
         console.log("[getAllWishlists] successful request")
         setWishlists(response.data)
       } else {
-        console.error("eror encountered while making request, response code:", response.status)
+        console.error("[getAllWishlists] error encountered while making request, response code:", response.status)
         return Error
       }
     })

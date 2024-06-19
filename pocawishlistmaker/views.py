@@ -49,3 +49,15 @@ class WishlistView(viewsets.ModelViewSet):
       return UpdateWishlistSerializer
     else:
       return WishlistSerializer
+
+class TagView(viewsets.ModelViewSet):
+  queryset = Tags.objects.all()
+  filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+  search_fields = ['name']
+  ordering_fields = ['name', 'id']
+
+  def get_serializer_class(self):
+    if self.action == 'create':
+      return CreateTagSerializer
+    else:
+      return TagSerializer

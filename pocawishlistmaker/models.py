@@ -20,7 +20,7 @@ class Items(models.Model):
 
 class Tags(models.Model):
   id = models.AutoField(primary_key=True) 
-  tag = models.CharField()
+  name = models.CharField()
   created_at = models.DateTimeField(default=timezone.now)
   updated_at = models.DateTimeField(default=timezone.now)
 
