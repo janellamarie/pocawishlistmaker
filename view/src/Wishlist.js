@@ -256,7 +256,7 @@ export function Wishlists() {
     console.log('[createTags] tags', tags)
     for (var i = 0; i < tags.length; i++) {
       list.push(
-        <Tag size='sm'>
+        <Tag size='sm' mr={1}>
           {tags[i].name}
         </Tag>
       )
@@ -288,8 +288,7 @@ export function Wishlists() {
             </Flex>
           </CardHeader>
           <CardBody pt='1%'>
-            <Text fontSize='sm' pb={1}>Tags</Text>
-            {createTags(wishlists[i].tags)}
+            
           </CardBody>
         </Card>
        
@@ -472,6 +471,12 @@ export function Wishlists() {
             <Divider p={1} />
           </>
           : <Box><Divider p={1} /></Box>}
+ 
+        {wishlist.tags !== '' ? 
+          <>
+            <Heading size='s' pb={1} pt={2}>Tags</Heading>
+            <Flex>{createTags(wishlists[selectedWishlist].tags)}</Flex>
+          </> : <Box><Divider p={1} /></Box>}
         
       </Box>
     )
