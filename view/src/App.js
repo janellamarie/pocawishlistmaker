@@ -5,6 +5,11 @@ import Items from './Items';
 import Tags from './Tags';
 import { Wishlists } from './Wishlist';
 
+export function getRandomColor() {
+  var colors = ["red", "orange", "green", "teal", "blue", "cyan", "purple", "pink"]
+  return colors[Math.floor(Math.random() * 8)] ;
+}
+
 function Navigation() {
   return(
     <Grid 

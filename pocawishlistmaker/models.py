@@ -34,6 +34,7 @@ class Wishlists(models.Model):
   created_at = models.DateTimeField(default=timezone.now)
   updated_at = models.DateTimeField(default=timezone.now)
   items = models.ManyToManyField(Items)
+  tags = models.ManyToManyField(Tags)
 
   def __str__(self):
     return '%s. %s %s'%(self.id, self.name, self.description)

@@ -76,7 +76,7 @@ function Tags() {
           variant='outline'>    
           <HStack>
             <Icon as={FaHashtag} />
-            <Text>
+            <Text >
               {tags[i].name} 
             </Text>
           </HStack>

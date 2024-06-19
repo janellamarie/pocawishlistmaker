@@ -4,12 +4,49 @@ import { useEffect } from 'react';
 
 import { AddIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons"
 import { 
-  Box, Divider, Grid, GridItem, Heading, IconButton, Input, InputGroup, InputRightElement, VStack, 
-  Tooltip, useDisclosure, useToast,  Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, 
-  ModalFooter, ModalOverlay, FormControl, FormLabel, Button, Textarea, Text, Card, CardHeader, CardBody, 
-  Flex, SimpleGrid, Image, Link, Badge, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, 
-  AlertDialogFooter, AlertDialogCloseButton
+  Box, 
+  Divider, 
+  Grid, 
+  GridItem, 
+  Heading, 
+  IconButton, 
+  Input, 
+  InputGroup, 
+  InputRightElement, 
+  VStack, 
+  Tooltip, 
+  useDisclosure,
+  useToast,
+  Modal, 
+  ModalBody, 
+  ModalCloseButton, 
+  ModalContent, 
+  ModalHeader, 
+  ModalFooter, 
+  ModalOverlay, 
+  FormControl, 
+  FormLabel, 
+  Button, 
+  Textarea, 
+  Text, 
+  Card, 
+  CardHeader, 
+  CardBody, 
+  Flex, 
+  SimpleGrid, 
+  Image, 
+  Link, 
+  Badge, 
+  AlertDialog, 
+  AlertDialogOverlay, 
+  AlertDialogContent, 
+  AlertDialogHeader, 
+  AlertDialogBody, 
+  AlertDialogFooter, 
+  AlertDialogCloseButton,
+  Tag
 } from "@chakra-ui/react"
+import { getRandomColor } from './App';
 
 export function Wishlists() {
   const [wishlists, setWishlists] = React.useState([])
@@ -19,14 +56,14 @@ export function Wishlists() {
     const asyncCall = async () => {
       const result = await axios.get("/api/wishlists/")
       setWishlists(result.data)
-      console.log('result.data', result.data)
+      console.info('result.data', result.data)
     }
     asyncCall();
   }, []);
 
 
   function getAllWishlists() {
-    console.log("fetching wishlists...")
+    console.log("[getAllWishlists] fetching wishlists...")
     axios.get("/api/wishlists/").then(response => {
       if (response.status >= 200 ) {
         console.log("[getAllWishlists] successful request")
@@ -214,6 +251,20 @@ export function Wishlists() {
     )
   }
 
+  function createTags(tags) {
+    var list = []
+    console.log('[createTags] tags', tags)
+    for (var i = 0; i < tags.length; i++) {
+      list.push(
+        <Tag size='sm'>
+          {tags[i].name}
+        </Tag>
+      )
+    }
+
+    return list
+  }
+
   function createWishlistList(wishlists) {
     function handleWishlistClick(event) {
       setSelectedWishlist(Number(event.target['offsetParent'].id))
@@ -233,12 +284,12 @@ export function Wishlists() {
           >
           <CardHeader pb='0'>
             <Flex justifyContent='space-between'>
-              <Heading size='s'>{wishlists[i].name}</Heading>
+              <Heading size='s' fontWeight='bolder'>{wishlists[i].name}</Heading>
             </Flex>
           </CardHeader>
           <CardBody pt='1%'>
-            <Text fontSize='xs'>Tags</Text>
-            {/* TODO: add Tags here */ }
+            <Text fontSize='sm' pb={1}>Tags</Text>
+            {createTags(wishlists[i].tags)}
           </CardBody>
         </Card>
        

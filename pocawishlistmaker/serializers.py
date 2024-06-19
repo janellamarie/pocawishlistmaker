@@ -2,6 +2,16 @@ from rest_framework import serializers
 from .models import Wishlists, Items, Tags
 from django.utils import timezone
 
+class TagSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Tags
+    fields = '__all__'
+
+class CreateTagSerializer(serializers.ModelSerializer):
+  class Meta:
+    model = Tags
+    fields = ['name']
+
 class ItemSerializer(serializers.ModelSerializer):
   class Meta:
     model = Items
@@ -14,6 +24,7 @@ class CreateItemSerializer(serializers.ModelSerializer):
 
 class WishlistSerializer(serializers.ModelSerializer):
   items = ItemSerializer(many=True, read_only=False)
+  tags = TagSerializer(many=True, read_only=False)
   description = serializers.CharField(allow_blank=True, allow_null=True)
 
   class Meta:
@@ -22,7 +33,7 @@ class WishlistSerializer(serializers.ModelSerializer):
     
 class UpdateWishlistSerializer(serializers.ModelSerializer):
   updated_at = serializers.DateTimeField(required=False)
-
+  
   class Meta:
     model = Wishlists
     fields = ['items', 'updated_at']
@@ -56,12 +67,3 @@ class CreateWishlistSerializer(serializers.ModelSerializer):
     model = Wishlists
     fields = ['name', 'description']
 
-class TagSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Tags
-    fields = '__all__'
-
-class CreateTagSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = Tags
-    fields = ['name']
