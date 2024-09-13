@@ -33,25 +33,34 @@ class WishlistSerializer(serializers.ModelSerializer):
     
 class UpdateWishlistSerializer(serializers.ModelSerializer):
   updated_at = serializers.DateTimeField(required=False)
-  
+  items = ItemSerializer(many=True, required=False)
+  tags = TagSerializer(many=True, required=False)
+
   class Meta:
     model = Wishlists
-    fields = ['items', 'updated_at']
+    fields = ['items', 'tags', 'updated_at']
 
-  # TODO: find a better way to make a request from the front-end to the back-end for deleting items from
+  # TODO: 
+  # find a better way to make a request from the front-end to the back-end for deleting items from
   # a wishlist
   def update(self, instance, validated_data):
     print("[UpdateWishlistSerializer.update] validated_data", validated_data)
     try:
-      if validated_data.get('updated_at') is None:
+      if validated_data.get('items') is not None and validated_data.get('updated_at') is None:
         print("[UpdateWishlistSerializer.update] - add item")
-        instance.items.add(validated_data.get('items')[0])
+        instance.items.add(validated_data.get('items')[0].get('id'))
         instance.updated_at = timezone.now()
         instance.save()
         return instance
-      else:
+      elif validated_data.get('items') is not None and validated_data.get('updated_at') is not None:
         print("[UpdateWishlistSerializer.update] - delete")
-        instance.items.remove(validated_data.get('items')[0])
+        instance.items.remove(validated_data.get('items'))
+        instance.updated_at = timezone.now()
+        instance.save()
+        return instance
+      elif validated_data.get('tags') is not None:
+        print("[UpdateWishlistSerializer.update] - add tags")
+        instance.tags.add(validated_data.get('tags')[0].get('id'))
         instance.updated_at = timezone.now()
         instance.save()
         return instance

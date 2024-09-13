@@ -61,3 +61,4 @@ class TagView(viewsets.ModelViewSet):
       return CreateTagSerializer
     else:
       return TagSerializer
+      

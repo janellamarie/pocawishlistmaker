@@ -2,7 +2,7 @@ import * as React from 'react';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-import { AddIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons"
+import { AddIcon, DeleteIcon, EditIcon, SearchIcon } from "@chakra-ui/icons"
 import { 
   Box, 
   Divider, 
@@ -44,7 +44,8 @@ import {
   AlertDialogBody, 
   AlertDialogFooter, 
   AlertDialogCloseButton,
-  Tag
+  Tag,
+  HStack
 } from "@chakra-ui/react"
 import { getRandomColor } from './App';
 
@@ -178,7 +179,7 @@ export function Wishlists() {
     )
   }
 
-  function WishlistOptions({id}) {
+  function DeleteWishlistButton({id}) {
     const {isOpen: isConfirmWishlistDeleteAlertDialogOpen, 
            onOpen: onConfirmWishlistDeleteAlertDialogOpen, 
            onClose: onConfirmWishlistDeleteAlertDialogClose } = useDisclosure()
@@ -195,17 +196,17 @@ export function Wishlists() {
           selectedWishlist > 1 ? setSelectedWishlist(selectedWishlist-1) : setSelectedWishlist(0)
           toast({
             title: 'Success!',
-            description: "Successfully deleted item from database.",
+            description: "Successfully deleted wishlist from database.",
             status: 'success',
             duration: 4000,
             isClosable: true,
             position: 'top'
           })
         } else {
-          console.error("error encountered")
+          console.error("[handleWishlistDelete] error encountered")
           toast({
             title: 'Error!',
-            description: "Unable to delete item from database.",
+            description: "Unable to delete wishlist from database.",
             status: 'error',
             duration: 4000,
             isClosable: true,
@@ -247,7 +248,47 @@ export function Wishlists() {
           </AlertDialogOverlay>
         </AlertDialog>
       </>
-      
+    )
+  }
+
+  function EditWishlistButton({id}) {
+    const toast = useToast()
+    const handleWishlistEdit = async event => {
+      console.log('[handleWishlistEdit] editing', id, '...')
+      let url = '/api/wishlists/' + id + '/'
+      axios.post(url).then(response => {
+        if (response.status >= 200) {
+          console.log("[handleWishlistEdit] successful request")
+          getAllWishlists()
+          selectedWishlist > 1 ? setSelectedWishlist(selectedWishlist-1) : setSelectedWishlist(0)
+          toast({
+            title: 'Success!',
+            description: "Successfully edited.",
+            status: 'success',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
+        } else {
+          console.error("[handleWishlistEdit] error encountered")
+          toast({
+            title: 'Error!',
+            description: "Unable to edit wishlist.",
+            status: 'error',
+            duration: 4000,
+            isClosable: true,
+            position: 'top'
+          })
+        }
+      })
+    };
+
+    return (
+      <>
+        <Tooltip label='Edit this wishlist' hasArrow>
+          <IconButton icon={<EditIcon />} colorScheme='blue' />
+        </Tooltip>
+      </>
     )
   }
 
@@ -306,7 +347,8 @@ export function Wishlists() {
     const cancelRef = React.useRef()
 
     const handleSmallItemDeleteOnClick = event => {
-      console.log("[handleSmallItemDeleteOnClick] event.target.id", event.target.id, 
+      console.log("[handleSmallItemDeleteOnClick]")
+      console.log("[handleSmallItemDeleteOnClick] event.target.id", id, 
                   "\n[handleSmallItemDeleteOnClick] selectedWishlist", wishlists[selectedWishlist].id)
       var url = '/api/wishlists/' + wishlists[selectedWishlist].id + '/'
       try {
@@ -315,7 +357,7 @@ export function Wishlists() {
           updated_at: new Date()
         }).then(response => {
           if (response.statusText === 'OK') {
-            console.error("[handleSmallItemDeleteOnClick] error encountered")
+            console.error("[handleSmallItemDeleteOnClick] no error")
             getAllWishlists()
             toast({
               title: 'Success!',
@@ -461,7 +503,10 @@ export function Wishlists() {
           <Heading size='lg'>
             {wishlist.name}
           </Heading>
-          <WishlistOptions id={wishlist.id} />
+          <HStack spacing={3}>
+            <EditWishlistButton id={wishlist.id} />
+            <DeleteWishlistButton id={wishlist.id} />
+          </HStack>
         </Flex>
 
         {wishlist.description !== '' ? 
@@ -477,7 +522,6 @@ export function Wishlists() {
             <Heading size='s' pb={1} pt={2}>Tags</Heading>
             <Flex>{createTags(wishlists[selectedWishlist].tags)}</Flex>
           </> : <Box><Divider p={1} /></Box>}
-        
       </Box>
     )
   }
