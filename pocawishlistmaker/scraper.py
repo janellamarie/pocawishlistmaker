@@ -55,7 +55,7 @@ def ScrapeMercariJP(url):
   else:
     status = 'available'
   
-  img_link = soup.select('img[alt="Thumbnail of "]')[0].get('src').split('?')[0]
+  img_link = soup.select('img[alt="のサムネイル"]')[0].get('src').split('?')[0]
   
   return {'name': name,'price': price, 'status': status, 'image_link': img_link}
 
