@@ -8,11 +8,17 @@ class TagSerializer(serializers.ModelSerializer):
     fields = '__all__'
 
 class CreateTagSerializer(serializers.ModelSerializer):
+  id = serializers.IntegerField()
+
   class Meta:
     model = Tags
     fields = ['name']
 
 class ItemSerializer(serializers.ModelSerializer):
+  # NOTE: AutoFields are READ ONLY by default, read article below 
+  # https://stackoverflow.com/questions/58123315/id-is-not-present-in-validate-and-listserializers-update-django-rest-framew
+  id = serializers.IntegerField()
+
   class Meta:
     model = Items
     fields = '__all__'
@@ -40,31 +46,33 @@ class UpdateWishlistSerializer(serializers.ModelSerializer):
     model = Wishlists
     fields = ['items', 'tags', 'updated_at']
 
-  # TODO: 
-  # find a better way to make a request from the front-end to the back-end for deleting items from
-  # a wishlist
+  # TODO: find a better way to make a request from the front-end to the 
+  # back-end for deleting items from a wishlist
   def update(self, instance, validated_data):
     print("[UpdateWishlistSerializer.update] validated_data", validated_data)
     try:
       if validated_data.get('items') is not None and validated_data.get('updated_at') is None:
         print("[UpdateWishlistSerializer.update] - add item")
-        instance.items.add(validated_data.get('items')[0].get('id'))
-        instance.updated_at = timezone.now()
-        instance.save()
+        for i in validated_data.get('items'):
+          instance.items.add(i.get('id'))
+          instance.updated_at = timezone.now()
+          instance.save()
         return instance
-      elif validated_data.get('items') is not None and validated_data.get('updated_at') is not None:
-        print("[UpdateWishlistSerializer.update] - delete")
-        instance.items.remove(validated_data.get('items'))
-        instance.updated_at = timezone.now()
-        instance.save()
-        return instance
-      elif validated_data.get('tags') is not None:
+      elif validated_data.get('tags') is not None and validated_data.get('items') is None:
         print("[UpdateWishlistSerializer.update] - add tags")
-        instance.tags.add(validated_data.get('tags')[0].get('id'))
-        instance.updated_at = timezone.now()
-        instance.save()
+        for t in validated_data.get('tags'):
+          instance.tags.add(t.get('id'))
+          instance.updated_at = timezone.now()
+          instance.save()
         return instance
-        
+      # elif validated_data.get('items') is not None and validated_data.get('update_at') is not None:
+      else:
+        print("[UpdateWishlistSerializer.update] - delete")
+        for i in validated_data.get('items'):
+          instance.items.remove(i.get('id'))
+          instance.updated_at = timezone.now()
+          instance.save()
+        return instance
     except Exception as e:
       raise e
 

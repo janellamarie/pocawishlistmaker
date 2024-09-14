@@ -47,7 +47,7 @@ import {
   Tag,
   HStack
 } from "@chakra-ui/react"
-import { getRandomColor } from './App';
+import { getRandomColor } from './App';;
 
 export function Wishlists() {
   const [wishlists, setWishlists] = React.useState([])
@@ -348,12 +348,18 @@ export function Wishlists() {
 
     const handleSmallItemDeleteOnClick = event => {
       console.log("[handleSmallItemDeleteOnClick]")
-      console.log("[handleSmallItemDeleteOnClick] event.target.id", id, 
-                  "\n[handleSmallItemDeleteOnClick] selectedWishlist", wishlists[selectedWishlist].id)
       var url = '/api/wishlists/' + wishlists[selectedWishlist].id + '/'
+      console.log("[handleSmallItemDeleteOnClick]",
+                  "\n event.target.id", id, 
+                  "\n selectedWishlist", wishlists[selectedWishlist].id,
+                  "\n url",)
+      
       try {
+        console.log(wishlists[selectedWishlist]['items'])
+        var item = wishlists[selectedWishlist]['items'].find((element) => element.id = id)
+        console.log("[handleSmallItemDeleteOnClick] item", item)
         axios.patch(url, {
-          items: [id],
+          items: [item],
           updated_at: new Date()
         }).then(response => {
           if (response.statusText === 'OK') {

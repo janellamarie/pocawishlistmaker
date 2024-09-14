@@ -205,8 +205,9 @@ function Items() {
       console.log('[handleAddToWishlistSubmit.url]', url, '\n[handleAddToWishlistSubmit.itemID]', itemID)
       setIsAddToWishlistLoading(true)
       try {
+        var data = items.find((element) => element.id = itemID)
         axios.put(url, {
-          items: [Number(itemID)]
+          items: [data]
         }).then(response => {
           if (response.statusText === 'OK') {
             console.log("[handleAddItemSubmit] success")
