@@ -106,6 +106,7 @@ function Tags() {
       setIsLoading(true)
       try {
         axios.post('/api/tags/', {
+          id: null,
           name: tagName
         }).then(response => {
           if (response.status >= 200) {

@@ -8,11 +8,11 @@ class TagSerializer(serializers.ModelSerializer):
     fields = '__all__'
 
 class CreateTagSerializer(serializers.ModelSerializer):
-  id = serializers.IntegerField()
+  id = serializers.IntegerField(allow_null=True)
 
   class Meta:
     model = Tags
-    fields = ['name']
+    fields = ['id', 'name']
 
 class ItemSerializer(serializers.ModelSerializer):
   # NOTE: AutoFields are READ ONLY by default, read article below 

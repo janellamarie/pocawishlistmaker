@@ -63,6 +63,7 @@ export function Wishlists() {
   }, []);
 
 
+  /* calls the database and gets all the wishlists */
   function getAllWishlists() {
     console.log("[getAllWishlists] fetching wishlists...")
     axios.get("/api/wishlists/").then(response => {
@@ -76,6 +77,7 @@ export function Wishlists() {
     })
   }
   
+  /*** Create Wishlist Button component ***/
   function CreateWishlistButton() {
     const {isOpen, onOpen, onClose} = useDisclosure()
     const [name, setName] = React.useState('')
@@ -108,7 +110,7 @@ export function Wishlists() {
             setIsLoading(false)
             toast({
               title: 'Error!',
-              description: "An error occured whie trying to create the wishlist.",
+              description: "An error occured while trying to create the wishlist.",
               status: 'error',
               duration: 4000,
               isClosable: true,
